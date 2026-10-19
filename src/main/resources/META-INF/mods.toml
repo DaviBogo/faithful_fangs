@@ -19,7 +19,7 @@ displayURL="https://github.com/davibogo/wolf_mod"
 authors="davibogo"
 #displayTest="MATCH_VERSION" #optional, default=MATCH_VERSION when not clientSideOnly, else IGNORE_ALL_VERSION
 
-description='''Lobos mais leais e inteligentes: seguem melhor o dono, podem renascer, usar armadura e voltar para casa.'''
+description='''Smarter, more loyal wolves: they follow their owner better, can respawn, wear armor and return home.'''
 
 [[dependencies.faithful_fangs]] #recommended
     modId="forge"
@@ -31,6 +31,6 @@ description='''Lobos mais leais e inteligentes: seguem melhor o dono, podem rena
 [[dependencies.faithful_fangs]] #recommended
     modId="minecraft"
     mandatory=true
-    versionRange="[26.3,26.4,)"
+    versionRange="[26.3,26.4)"
     ordering="NONE"
     side="BOTH"

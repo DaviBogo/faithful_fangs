@@ -7,8 +7,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
 /**
- * Classe principal do Faithful Fangs.
- * O valor de MODID precisa ser igual ao modId do arquivo META-INF/mods.toml.
+ * Main class of Faithful Fangs.
+ * The MODID value must match the modId in META-INF/mods.toml.
  */
 @Mod(FaithfulFangs.MODID)
 public final class FaithfulFangs {
@@ -22,6 +22,6 @@ public final class FaithfulFangs {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        LOGGER.info("Faithful Fangs carregado! Seus lobos agradecem.");
+        LOGGER.info("Faithful Fangs loaded! Your wolves thank you.");
     }
 }
