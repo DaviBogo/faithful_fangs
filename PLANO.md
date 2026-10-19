@@ -142,3 +142,25 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 - Sistema 5 (melhorias) definido em 19/10/2026.
 - Sistema 6 (armadura) definido em 19/10/2026; atributo Couro removido.
 - **Design completo.** Próximo passo: implementar a Fase 1.
+- Detalhes da Fase 1 definidos em 19/10/2026: receita da Dog Tag (1 pepita de ferro + 1 linha, sem formato fixo); receita da Dog Bed (5 lãs da mesma cor em formato de almofada `W_W` / `WWW`, 16 cores como as camas vanilla); renomear um lobo já vinculado consome a plaquinha em branco.
+- Idioma: o mod é 100% em inglês (`en_us.json` é o oficial). Nomes: Dog Tag, Dog Bed, Ancient Bone, Blazing Bone, Ethereal Bone; modos Follow / Stay Home / Sit; posturas Passive / Neutral / Aggressive; atributos Health / Strength / Agility / Scent.
+
+## Progresso da implementação
+
+### Fase 1 — Cama, plaquinha, vínculo e modos (em andamento)
+- [x] **1. Textos em inglês:** descrição do `mods.toml` e mensagem de log traduzidas; faixa de versão do Minecraft corrigida no `mods.toml` (`[26.3,26.4)`).
+- [x] **2. Dog Tag** (`faithful_fangs:dog_tag`): item com dois estados, em branco e gravada. O estado gravado fica no componente de dados `faithful_fangs:engraved_tag` (UUID do lobo + nome). Textura própria para cada estado, tooltip explicando o uso, receita (desbloqueada no livro de receitas ao pegar uma pepita de ferro) e entrada na aba Ferramentas e Utilidades, logo depois da Name Tag.
+- [ ] **3. Dog Bed:** bloco nas 16 cores de lã, com block entity (guarda o lobo vinculado).
+- [ ] **4. Dados do vínculo:** registro global salvo com o mundo (lobo → cama, cama → lobo, pendências) + cópia dos dados no lobo e na cama.
+- [ ] **5. Fluxo de vínculo:** tela para digitar o nome, plaquinha gravada, uso na cama e casos de borda.
+- [ ] **6. Nome flutuante** sobre a cama.
+- [ ] **7. Painel do lobo** (Shift + clique direito), já como menu de inventário para receber o espaço de armadura na Fase 5.
+- [ ] **8a. Modos Sit e Follow** pelo painel.
+- [ ] **8b. Posturas** Passive / Neutral / Aggressive.
+- [ ] **8c. Stay Home:** passeio no raio, defesa, dormir à noite, retorno com teleporte e invulnerabilidade.
+- [ ] **8d. Melhorias do Follow:** evitar perigos, travar menos, medo de creeper.
+
+### Estrutura do código
+- `FaithfulFangs` — classe principal; registra os `DeferredRegister` e a aba criativa.
+- `registry/ModItems`, `registry/ModDataComponents` — registros.
+- `item/DogTagItem`, `item/EngravedTag` — plaquinha e o componente de gravação.

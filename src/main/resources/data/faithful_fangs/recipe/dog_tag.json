@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:iron_nugget",
+    "minecraft:string"
+  ],
+  "result": {
+    "id": "faithful_fangs:dog_tag"
+  }
+}

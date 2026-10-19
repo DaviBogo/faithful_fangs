@@ -1,2 +1,6 @@
 {
+  "item.faithful_fangs.dog_tag": "Dog Tag",
+  "item.faithful_fangs.dog_tag.tooltip.blank": "Use on a wolf you tamed to engrave its name",
+  "item.faithful_fangs.dog_tag.tooltip.engraved": "Engraved: %s",
+  "item.faithful_fangs.dog_tag.tooltip.use_on_bed": "Use on a Dog Bed to give this wolf a home"
 }
