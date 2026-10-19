@@ -1,12 +1,16 @@
 package com.davibogo.faithfulfangs.block;
 
+import com.davibogo.faithfulfangs.bond.Bond;
+import com.davibogo.faithfulfangs.bond.BondManager;
 import com.davibogo.faithfulfangs.registry.ModBlockEntities;
+import java.util.Objects;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -41,16 +45,36 @@ public class DogBedBlockEntity extends BlockEntity {
         return this.wolfName;
     }
 
-    public void bind(UUID wolfId, String wolfName) {
-        this.wolfId = wolfId;
-        this.wolfName = wolfName;
-        this.markUpdated();
+    /**
+     * Updates this bed's copy of its bond (null = free bed). Only {@link BondManager} should call this;
+     * the {@link com.davibogo.faithfulfangs.bond.BondRegistry} is the source of truth.
+     */
+    public void applyBond(@Nullable Bond bond) {
+        UUID newWolf = bond == null ? null : bond.wolfId();
+        String newName = bond == null ? "" : bond.wolfName();
+        if (!Objects.equals(this.wolfId, newWolf) || !this.wolfName.equals(newName)) {
+            this.wolfId = newWolf;
+            this.wolfName = newName;
+            this.markUpdated();
+        }
     }
 
-    public void unbind() {
-        this.wolfId = null;
-        this.wolfName = "";
-        this.markUpdated();
+    /** Called on the server when the bed block is removed for any reason (broken, exploded, replaced). */
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (this.level instanceof ServerLevel serverLevel) {
+            BondManager.onBedRemoved(serverLevel, pos);
+        }
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        // The bond may have changed while this chunk was unloaded (e.g. the wolf moved to another bed).
+        if (this.level instanceof ServerLevel serverLevel) {
+            BondManager.syncBed(serverLevel, this);
+        }
     }
 
     /** Saves the change and sends it to clients tracking this block. */

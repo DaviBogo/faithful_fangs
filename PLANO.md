@@ -151,7 +151,13 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 - [x] **1. Textos em inglês:** descrição do `mods.toml` e mensagem de log traduzidas; faixa de versão do Minecraft corrigida no `mods.toml` (`[26.3,26.4)`).
 - [x] **2. Dog Tag** (`faithful_fangs:dog_tag`): item com dois estados, em branco e gravada. O estado gravado fica no componente de dados `faithful_fangs:engraved_tag` (UUID do lobo + nome). Textura própria para cada estado, tooltip explicando o uso, receita (desbloqueada no livro de receitas ao pegar uma pepita de ferro) e entrada na aba Ferramentas e Utilidades, logo depois da Name Tag.
 - [x] **3. Dog Bed** (`faithful_fangs:<cor>_dog_bed`, 16 cores): almofada de 1 bloco com borda (encosto alto atrás, laterais e borda baixa na frente), usando a textura da lã da mesma cor. O lado aberto fica virado para quem coloca. Receita `W_W` / `WWW` com lã da mesma cor (livro de receitas desbloqueia ao pegar a lã), dropa a si mesma, empilha até 1 como as camas vanilla e aparece em Blocos Funcionais logo depois das camas vanilla. A block entity `faithful_fangs:dog_bed` já guarda o UUID e o nome do lobo e sincroniza com o cliente (ainda sem uso).
-- [ ] **4. Dados do vínculo:** registro global salvo com o mundo (lobo → cama, cama → lobo, pendências) + cópia dos dados no lobo e na cama.
+- [x] **4. Dados do vínculo:**
+  - **Registro global** (`BondRegistry`, salvo em `data/faithful_fangs/bonds.dat` do mundo): para cada lobo vinculado guarda o UUID do lobo, o dono, o nome e a cama (dimensão + posição). É a fonte da verdade; também indexa cama → lobo (uma cama por lobo, um lobo por cama).
+  - **Cópias:** a cama guarda o lobo e o nome (para exibir); o lobo guarda o nome que o vínculo deu a ele (`bond_name`, nos dados persistentes do Forge). Quando a cama ou o lobo carregam, comparam a cópia com o registro e se corrigem. Assim, mudanças feitas com eles descarregados (em outra dimensão, longe) são aplicadas depois.
+  - **Regras do nome:** lobo vinculado recebe o nome do vínculo. Se o vínculo acaba, o lobo perde o nome, a menos que o jogador tenha trocado o nome depois com uma Name Tag vanilla.
+  - **Cama removida** (quebrada, explodida ou trocada por comando): o vínculo é desfeito. O aviso ao dono e a plaquinha nova que cai ficam para o passo 5.
+  - **Lobo vinculado que morre:** por enquanto o vínculo continua (a cama fica reservada); o respawn da Fase 2 vai usar isso.
+  - **Comando de teste** `/faithfulfangs debug` (só operador; textos em inglês sem tradução): sem argumentos lista os vínculos e descreve o lobo ou a cama para onde você olha; `bind <nome>` vincula o lobo para onde você olha à Dog Bed livre mais próxima (16 blocos); `unbind` desfaz o vínculo do lobo ou da cama para onde você olha.
 - [ ] **5. Fluxo de vínculo:** tela para digitar o nome, plaquinha gravada, uso na cama e casos de borda.
 - [ ] **6. Nome flutuante** sobre a cama.
 - [ ] **7. Painel do lobo** (Shift + clique direito), já como menu de inventário para receber o espaço de armadura na Fase 5.
@@ -165,3 +171,7 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 - `registry/ModBlocks`, `registry/ModItems`, `registry/ModBlockEntities`, `registry/ModDataComponents` — registros.
 - `item/DogTagItem`, `item/EngravedTag` — plaquinha e o componente de gravação.
 - `block/DogBedBlock`, `block/DogBedBlockEntity` — cama e os dados do vínculo guardados nela.
+- `bond/Bond`, `bond/BondRegistry`, `bond/BondManager` — vínculo, registro global e todas as operações (vincular, desvincular, renomear, sincronizar cópias).
+- `wolf/WolfData` — dados do mod guardados no lobo.
+- `event/ServerEvents` — listeners (lobo entrando no mundo, registro de comandos).
+- `command/FaithfulFangsCommand` — `/faithfulfangs debug`.
