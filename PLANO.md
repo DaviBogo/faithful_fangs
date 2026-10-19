@@ -170,7 +170,11 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 - [x] **7. Painel do lobo** (Shift + clique direito no seu lobo; com a Dog Tag na mão vale a plaquinha): menu de container (`faithful_fangs:wolf_panel`), pronto para receber o espaço de armadura e o inventário na Fase 5. Mostra o lobo girando (como no inventário do cavalo), a vida em corações (atualiza ao vivo), a cama (dimensão + coordenadas) ou "No bed", e os botões de modo e postura. O selecionado fica com o texto amarelo; cada botão tem tooltip. "Stay Home" fica desativado sem cama. Os botões usam o pacote vanilla de clique em botão de container; o servidor confere dono e distância (8 blocos).
 - [x] **8a. Modos Sit e Follow** pelo painel. Modelo de dados: "Sit" é o próprio estado sentado vanilla; o mod guarda à parte o **modo de pé** (Follow ou Stay Home). Assim o clique direito vanilla continua sentando/levantando, e ao levantar o lobo **volta ao modo anterior** (decidido em 19/10/2026). Se o lobo perde a cama, o modo de pé volta para Follow. A postura (padrão Neutral) também fica guardada no lobo.
   - Por enquanto "Stay Home" e as posturas só ficam salvos; o comportamento vem nos passos 8b e 8c (até lá o lobo age como no vanilla).
-- [ ] **8b. Posturas** Passive / Neutral / Aggressive.
+- [x] **8b. Posturas** (objetivos de IA adicionados a todo lobo ao entrar no mundo; só agem em lobos domesticados):
+  - **Passive:** um objetivo de alvo com prioridade máxima impede todos os ataques vanilla (defender o dono, revidar, caçar esqueletos) e zera alvo e raiva. Se o lobo acabou de apanhar (até 5 s) ou algum mob está mirando nele (raio de 10 blocos), ele foge correndo até ficar a 16 blocos. Golpe do próprio dono não conta.
+  - **Neutral:** vanilla, sem mudanças.
+  - **Aggressive:** ataca qualquer mob hostil (interface `Enemy`) ao alcance, mesmo antes do dono, desde que consiga ver e chegar até ele. Ignora creepers (medo de creeper vem no 8d), endermen e zombified piglins calmos, piglins que não estão hostis, warden, wither e dragão. Lobo sentado não ataca.
+  - Trocar para Passive no meio de uma briga faz o lobo parar na hora.
 - [ ] **8c. Stay Home:** passeio no raio, defesa, dormir à noite, retorno com teleporte e invulnerabilidade.
 - [ ] **8d. Melhorias do Follow:** evitar perigos, travar menos, medo de creeper.
 
@@ -187,4 +191,5 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 - `client/DogBedRenderer`, `client/ClientSetup` — nome flutuante sobre a cama e registros só do cliente.
 - `menu/WolfPanelMenu`, `client/WolfPanelScreen`, `registry/ModMenuTypes` — Painel do lobo (textura em `textures/gui/wolf_panel.png`).
 - `wolf/WolfMode`, `wolf/WolfStance`, `wolf/WolfCommands` — modos, posturas e a aplicação deles no lobo.
+- `wolf/ai/WolfGoals`, `wolf/ai/PassiveNoTargetGoal`, `wolf/ai/PassiveFleeGoal` — IA das posturas.
 - `command/FaithfulFangsCommand` — `/faithfulfangs debug`.

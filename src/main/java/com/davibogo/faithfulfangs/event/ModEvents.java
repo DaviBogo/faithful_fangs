@@ -6,6 +6,7 @@ import com.davibogo.faithfulfangs.item.DogTagItem;
 import com.davibogo.faithfulfangs.item.EngravedTag;
 import com.davibogo.faithfulfangs.menu.WolfPanelMenu;
 import com.davibogo.faithfulfangs.registry.ModItems;
+import com.davibogo.faithfulfangs.wolf.ai.WolfGoals;
 import java.util.function.Predicate;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -33,9 +34,13 @@ public final class ModEvents {
         RegisterCommandsEvent.BUS.addListener(ModEvents::onRegisterCommands);
     }
 
-    /** A wolf that loads (or changes dimension) catches up with bond changes made while it was away. */
+    /**
+     * A wolf that loads (or changes dimension) gets the mod's AI goals and catches up with bond
+     * changes made while it was away.
+     */
     private static void onEntityJoinLevel(EntityJoinLevelEvent event) {
         if (event.getLevel() instanceof ServerLevel level && event.getEntity() instanceof Wolf wolf) {
+            WolfGoals.install(wolf);
             BondManager.syncWolf(level.getServer(), wolf);
         }
     }

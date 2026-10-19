@@ -1,6 +1,7 @@
 package com.davibogo.faithfulfangs.wolf;
 
 import com.davibogo.faithfulfangs.bond.BondRegistry;
+import com.davibogo.faithfulfangs.wolf.ai.PassiveNoTargetGoal;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 
@@ -30,6 +31,9 @@ public final class WolfCommands {
 
     public static void setStance(Wolf wolf, WolfStance stance) {
         WolfData.setStance(wolf, stance);
+        if (stance == WolfStance.PASSIVE) {
+            PassiveNoTargetGoal.calmDown(wolf); // stop a fight right away
+        }
     }
 
     public static boolean hasBed(MinecraftServer server, Wolf wolf) {
