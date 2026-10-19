@@ -1,0 +1,6 @@
+{
+  "parent": "faithful_fangs:block/dog_bed",
+  "textures": {
+    "wool": "minecraft:block/magenta_wool"
+  }
+}

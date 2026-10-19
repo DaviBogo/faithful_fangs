@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipes": "faithful_fangs:light_gray_dog_bed"
+      }
+    },
+    "has_light_gray_wool": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:light_gray_wool"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_light_gray_wool"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "faithful_fangs:light_gray_dog_bed"
+    ]
+  }
+}

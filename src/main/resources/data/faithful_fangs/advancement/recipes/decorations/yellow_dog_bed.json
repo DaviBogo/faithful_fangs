@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipes": "faithful_fangs:yellow_dog_bed"
+      }
+    },
+    "has_yellow_wool": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:yellow_wool"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_yellow_wool"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "faithful_fangs:yellow_dog_bed"
+    ]
+  }
+}

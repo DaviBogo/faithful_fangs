@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "dog_bed",
+  "key": {
+    "W": "minecraft:pink_wool"
+  },
+  "pattern": [
+    "W W",
+    "WWW"
+  ],
+  "result": {
+    "id": "faithful_fangs:pink_dog_bed"
+  }
+}

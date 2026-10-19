@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "faithful_fangs:block/orange_dog_bed"
+    },
+    "facing=east": {
+      "model": "faithful_fangs:block/orange_dog_bed",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "faithful_fangs:block/orange_dog_bed",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "faithful_fangs:block/orange_dog_bed",
+      "y": 270
+    }
+  }
+}

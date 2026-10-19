@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipes": "faithful_fangs:blue_dog_bed"
+      }
+    },
+    "has_blue_wool": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:blue_wool"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_blue_wool"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "faithful_fangs:blue_dog_bed"
+    ]
+  }
+}

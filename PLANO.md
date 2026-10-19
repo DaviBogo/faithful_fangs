@@ -150,7 +150,7 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 ### Fase 1 — Cama, plaquinha, vínculo e modos (em andamento)
 - [x] **1. Textos em inglês:** descrição do `mods.toml` e mensagem de log traduzidas; faixa de versão do Minecraft corrigida no `mods.toml` (`[26.3,26.4)`).
 - [x] **2. Dog Tag** (`faithful_fangs:dog_tag`): item com dois estados, em branco e gravada. O estado gravado fica no componente de dados `faithful_fangs:engraved_tag` (UUID do lobo + nome). Textura própria para cada estado, tooltip explicando o uso, receita (desbloqueada no livro de receitas ao pegar uma pepita de ferro) e entrada na aba Ferramentas e Utilidades, logo depois da Name Tag.
-- [ ] **3. Dog Bed:** bloco nas 16 cores de lã, com block entity (guarda o lobo vinculado).
+- [x] **3. Dog Bed** (`faithful_fangs:<cor>_dog_bed`, 16 cores): almofada de 1 bloco com borda (encosto alto atrás, laterais e borda baixa na frente), usando a textura da lã da mesma cor. O lado aberto fica virado para quem coloca. Receita `W_W` / `WWW` com lã da mesma cor (livro de receitas desbloqueia ao pegar a lã), dropa a si mesma, empilha até 1 como as camas vanilla e aparece em Blocos Funcionais logo depois das camas vanilla. A block entity `faithful_fangs:dog_bed` já guarda o UUID e o nome do lobo e sincroniza com o cliente (ainda sem uso).
 - [ ] **4. Dados do vínculo:** registro global salvo com o mundo (lobo → cama, cama → lobo, pendências) + cópia dos dados no lobo e na cama.
 - [ ] **5. Fluxo de vínculo:** tela para digitar o nome, plaquinha gravada, uso na cama e casos de borda.
 - [ ] **6. Nome flutuante** sobre a cama.
@@ -162,5 +162,6 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 
 ### Estrutura do código
 - `FaithfulFangs` — classe principal; registra os `DeferredRegister` e a aba criativa.
-- `registry/ModItems`, `registry/ModDataComponents` — registros.
+- `registry/ModBlocks`, `registry/ModItems`, `registry/ModBlockEntities`, `registry/ModDataComponents` — registros.
 - `item/DogTagItem`, `item/EngravedTag` — plaquinha e o componente de gravação.
+- `block/DogBedBlock`, `block/DogBedBlockEntity` — cama e os dados do vínculo guardados nela.

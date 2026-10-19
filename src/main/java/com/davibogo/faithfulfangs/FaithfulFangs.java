@@ -1,10 +1,14 @@
 package com.davibogo.faithfulfangs;
 
+import com.davibogo.faithfulfangs.registry.ModBlockEntities;
+import com.davibogo.faithfulfangs.registry.ModBlocks;
 import com.davibogo.faithfulfangs.registry.ModDataComponents;
 import com.davibogo.faithfulfangs.registry.ModItems;
 import com.mojang.logging.LogUtils;
+import java.util.List;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -22,11 +26,20 @@ public final class FaithfulFangs {
     public static final String MODID = "faithful_fangs";
     public static final Logger LOGGER = LogUtils.getLogger();
 
+    /** Same color order the vanilla creative tabs use for beds, wool, etc. */
+    private static final List<DyeColor> CREATIVE_COLOR_ORDER = List.of(
+            DyeColor.WHITE, DyeColor.LIGHT_GRAY, DyeColor.GRAY, DyeColor.BLACK,
+            DyeColor.BROWN, DyeColor.RED, DyeColor.ORANGE, DyeColor.YELLOW,
+            DyeColor.LIME, DyeColor.GREEN, DyeColor.CYAN, DyeColor.LIGHT_BLUE,
+            DyeColor.BLUE, DyeColor.PURPLE, DyeColor.MAGENTA, DyeColor.PINK);
+
     public FaithfulFangs(FMLJavaModLoadingContext context) {
         var modBusGroup = context.getModBusGroup();
 
-        ModDataComponents.DATA_COMPONENTS.register(modBusGroup);
+        ModBlocks.BLOCKS.register(modBusGroup);
         ModItems.ITEMS.register(modBusGroup);
+        ModBlockEntities.BLOCK_ENTITY_TYPES.register(modBusGroup);
+        ModDataComponents.DATA_COMPONENTS.register(modBusGroup);
 
         FMLCommonSetupEvent.getBus(modBusGroup).addListener(this::commonSetup);
         BuildCreativeModeTabContentsEvent.BUS.addListener(FaithfulFangs::addCreativeTabItems);
@@ -37,12 +50,18 @@ public final class FaithfulFangs {
     }
 
     private static void addCreativeTabItems(final BuildCreativeModeTabContentsEvent event) {
+        var visibility = CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS;
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
-            // Place the Dog Tag right after the vanilla Name Tag.
-            event.getEntries().putAfter(
-                    new ItemStack(Items.NAME_TAG),
-                    new ItemStack(ModItems.DOG_TAG.get()),
-                    CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+            // Dog Tag right after the vanilla Name Tag.
+            event.getEntries().putAfter(new ItemStack(Items.NAME_TAG), new ItemStack(ModItems.DOG_TAG.get()), visibility);
+        } else if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
+            // Dog Beds right after the vanilla beds (the straw bed is the last one).
+            ItemStack previous = new ItemStack(Items.STRAW_BED);
+            for (DyeColor color : CREATIVE_COLOR_ORDER) {
+                ItemStack bed = new ItemStack(ModItems.DOG_BEDS.get(color).get());
+                event.getEntries().putAfter(previous, bed, visibility);
+                previous = bed;
+            }
         }
     }
 }
