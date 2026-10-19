@@ -1,5 +1,6 @@
 package com.davibogo.faithfulfangs;
 
+import com.davibogo.faithfulfangs.client.ClientSetup;
 import com.davibogo.faithfulfangs.event.ModEvents;
 import com.davibogo.faithfulfangs.network.ModNetwork;
 import com.davibogo.faithfulfangs.registry.ModBlockEntities;
@@ -17,6 +18,7 @@ import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.slf4j.Logger;
 
 /**
@@ -47,6 +49,9 @@ public final class FaithfulFangs {
         BuildCreativeModeTabContentsEvent.BUS.addListener(FaithfulFangs::addCreativeTabItems);
         ModEvents.register();
         ModNetwork.init();
+        if (FMLEnvironment.dist.isClient()) {
+            ClientSetup.register();
+        }
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {

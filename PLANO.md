@@ -166,7 +166,7 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
   - **Cama removida:** além de desfazer o vínculo, dropa uma plaquinha em branco e o dono (se online) recebe aviso no chat.
   - **Name Tag vanilla num lobo vinculado:** o vínculo e a cama passam a usar o novo nome (a Name Tag continua funcionando normalmente).
   - Rede: canal `faithful_fangs:main` com dois pacotes (abrir a tela no cliente; confirmar o nome no servidor).
-- [ ] **6. Nome flutuante** sobre a cama.
+- [x] **6. Nome flutuante** sobre a cama: quando a mira está na cama vinculada (alcance normal de interação), o nome do lobo aparece acima dela no mesmo estilo da Name Tag vanilla (visível através de blocos). Feito com um block entity renderer (`client/DogBedRenderer`); o modelo da cama continua sendo o modelo de bloco. O plano B (plaquinha desenhada na cama) não foi necessário.
 - [ ] **7. Painel do lobo** (Shift + clique direito), já como menu de inventário para receber o espaço de armadura na Fase 5.
 - [ ] **8a. Modos Sit e Follow** pelo painel.
 - [ ] **8b. Posturas** Passive / Neutral / Aggressive.
@@ -183,4 +183,5 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 - `event/ModEvents` — listeners (lobo entrando no mundo, clique direito em lobo com Dog Tag/Name Tag, registro de comandos).
 - `network/ModNetwork`, `network/OpenTagScreenPacket`, `network/EngraveTagPacket` — canal de rede e pacotes.
 - `client/DogTagScreen`, `client/ClientPacketHandlers` — tela do nome (só no cliente).
+- `client/DogBedRenderer`, `client/ClientSetup` — nome flutuante sobre a cama e registros só do cliente.
 - `command/FaithfulFangsCommand` — `/faithfulfangs debug`.
