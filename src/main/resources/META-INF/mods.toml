@@ -5,31 +5,30 @@
 modLoader="javafml"
 loaderVersion="[66,)"
 license="All Rights Reserved"
-#issueTrackerURL="https://github.com/MyOrganization/MyMod/" #optional
+issueTrackerURL="https://github.com/davibogo/wolf_mod/issues"
 #clientSideOnly=true #optional, default=false
 
 [[mods]]
-modId="examplemod"
+modId="faithful_fangs"
 version="1.0.0"
-displayName="Example Mod"
+displayName="Faithful Fangs"
 #updateJSONURL="https://example.com/updates.json" #optional
-#displayURL="https://example.com/" #optional
-#logoFile="examplemod.png" #optional
+displayURL="https://github.com/davibogo/wolf_mod"
+#logoFile="faithful_fangs.png" #optional
 #credits="" #optional
-authors="YourNameHere, OtherNameHere" #optional
+authors="davibogo"
 #displayTest="MATCH_VERSION" #optional, default=MATCH_VERSION when not clientSideOnly, else IGNORE_ALL_VERSION
 
-description='''Example mod description.
-Newline characters can be used like this, and rendered on the mods screen properly.'''
+description='''Lobos mais leais e inteligentes: seguem melhor o dono, podem renascer, usar armadura e voltar para casa.'''
 
-[[dependencies.examplemod]] #recommended
+[[dependencies.faithful_fangs]] #recommended
     modId="forge"
     mandatory=true
     versionRange="[66,)"
     ordering="NONE"
     side="BOTH"
 
-[[dependencies.examplemod]] #recommended
+[[dependencies.faithful_fangs]] #recommended
     modId="minecraft"
     mandatory=true
     versionRange="[26.3,26.4,)"
