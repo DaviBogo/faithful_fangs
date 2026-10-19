@@ -167,8 +167,9 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
   - **Name Tag vanilla num lobo vinculado:** o vínculo e a cama passam a usar o novo nome (a Name Tag continua funcionando normalmente).
   - Rede: canal `faithful_fangs:main` com dois pacotes (abrir a tela no cliente; confirmar o nome no servidor).
 - [x] **6. Nome flutuante** sobre a cama: quando a mira está na cama vinculada (alcance normal de interação), o nome do lobo aparece acima dela no mesmo estilo da Name Tag vanilla (visível através de blocos). Feito com um block entity renderer (`client/DogBedRenderer`); o modelo da cama continua sendo o modelo de bloco. O plano B (plaquinha desenhada na cama) não foi necessário.
-- [ ] **7. Painel do lobo** (Shift + clique direito), já como menu de inventário para receber o espaço de armadura na Fase 5.
-- [ ] **8a. Modos Sit e Follow** pelo painel.
+- [x] **7. Painel do lobo** (Shift + clique direito no seu lobo; com a Dog Tag na mão vale a plaquinha): menu de container (`faithful_fangs:wolf_panel`), pronto para receber o espaço de armadura e o inventário na Fase 5. Mostra o lobo girando (como no inventário do cavalo), a vida em corações (atualiza ao vivo), a cama (dimensão + coordenadas) ou "No bed", e os botões de modo e postura. O selecionado fica com o texto amarelo; cada botão tem tooltip. "Stay Home" fica desativado sem cama. Os botões usam o pacote vanilla de clique em botão de container; o servidor confere dono e distância (8 blocos).
+- [x] **8a. Modos Sit e Follow** pelo painel. Modelo de dados: "Sit" é o próprio estado sentado vanilla; o mod guarda à parte o **modo de pé** (Follow ou Stay Home). Assim o clique direito vanilla continua sentando/levantando, e ao levantar o lobo **volta ao modo anterior** (decidido em 19/10/2026). Se o lobo perde a cama, o modo de pé volta para Follow. A postura (padrão Neutral) também fica guardada no lobo.
+  - Por enquanto "Stay Home" e as posturas só ficam salvos; o comportamento vem nos passos 8b e 8c (até lá o lobo age como no vanilla).
 - [ ] **8b. Posturas** Passive / Neutral / Aggressive.
 - [ ] **8c. Stay Home:** passeio no raio, defesa, dormir à noite, retorno com teleporte e invulnerabilidade.
 - [ ] **8d. Melhorias do Follow:** evitar perigos, travar menos, medo de creeper.
@@ -184,4 +185,6 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 - `network/ModNetwork`, `network/OpenTagScreenPacket`, `network/EngraveTagPacket` — canal de rede e pacotes.
 - `client/DogTagScreen`, `client/ClientPacketHandlers` — tela do nome (só no cliente).
 - `client/DogBedRenderer`, `client/ClientSetup` — nome flutuante sobre a cama e registros só do cliente.
+- `menu/WolfPanelMenu`, `client/WolfPanelScreen`, `registry/ModMenuTypes` — Painel do lobo (textura em `textures/gui/wolf_panel.png`).
+- `wolf/WolfMode`, `wolf/WolfStance`, `wolf/WolfCommands` — modos, posturas e a aplicação deles no lobo.
 - `command/FaithfulFangsCommand` — `/faithfulfangs debug`.

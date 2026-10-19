@@ -4,6 +4,7 @@ import com.davibogo.faithfulfangs.bond.BondManager;
 import com.davibogo.faithfulfangs.command.FaithfulFangsCommand;
 import com.davibogo.faithfulfangs.item.DogTagItem;
 import com.davibogo.faithfulfangs.item.EngravedTag;
+import com.davibogo.faithfulfangs.menu.WolfPanelMenu;
 import com.davibogo.faithfulfangs.registry.ModItems;
 import java.util.function.Predicate;
 import net.minecraft.core.component.DataComponents;
@@ -12,6 +13,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.animal.wolf.Wolf;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -57,12 +59,22 @@ public final class ModEvents {
             return true;
         }
 
+        // Shift + right click on your wolf: Wolf Panel. A plain right click stays vanilla (sit / stand, feed).
+        Player player = event.getEntity();
+        if (player.isSecondaryUseActive() && wolf.isTame() && wolf.isOwnedBy(player)) {
+            if (player instanceof ServerPlayer serverPlayer) {
+                WolfPanelMenu.open(serverPlayer, wolf);
+            }
+            event.setCancellationResult(InteractionResult.SUCCESS);
+            return true;
+        }
+
         // Vanilla Name Tag on a wolf with a bed: the bed follows the new name. Vanilla still applies the tag.
-        if (stack.is(Items.NAME_TAG) && event.getEntity() instanceof ServerPlayer player) {
+        if (stack.is(Items.NAME_TAG) && player instanceof ServerPlayer serverPlayer) {
             Component customName = stack.get(DataComponents.CUSTOM_NAME);
             String name = customName == null ? null : EngravedTag.sanitizeName(customName.getString());
             if (name != null) {
-                BondManager.rename(player.level().getServer(), wolf.getUUID(), name);
+                BondManager.rename(serverPlayer.level().getServer(), wolf.getUUID(), name);
             }
         }
         return false;

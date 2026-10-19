@@ -2,6 +2,7 @@ package com.davibogo.faithfulfangs.bond;
 
 import com.davibogo.faithfulfangs.block.DogBedBlockEntity;
 import com.davibogo.faithfulfangs.wolf.WolfData;
+import com.davibogo.faithfulfangs.wolf.WolfMode;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
@@ -108,12 +109,18 @@ public final class BondManager {
                 wolf.setCustomName(Component.literal(bond.wolfName()));
                 WolfData.setBondName(wolf, bond.wolfName());
             }
-        } else if (appliedName != null) {
-            Component current = wolf.getCustomName();
-            if (current != null && current.getString().equals(appliedName)) {
-                wolf.setCustomName(null);
+        } else {
+            if (appliedName != null) {
+                Component current = wolf.getCustomName();
+                if (current != null && current.getString().equals(appliedName)) {
+                    wolf.setCustomName(null);
+                }
+                WolfData.setBondName(wolf, null);
             }
-            WolfData.setBondName(wolf, null);
+            // No bed, no home: a wolf left in Stay Home goes back to following.
+            if (WolfData.getStandingMode(wolf) == WolfMode.STAY_HOME) {
+                WolfData.setStandingMode(wolf, WolfMode.FOLLOW);
+            }
         }
     }
 

@@ -11,6 +11,8 @@ import org.jspecify.annotations.Nullable;
 public final class WolfData {
     private static final String ROOT = "faithful_fangs";
     private static final String BOND_NAME = "bond_name";
+    private static final String STANDING_MODE = "standing_mode";
+    private static final String STANCE = "stance";
 
     private WolfData() {
     }
@@ -20,18 +22,56 @@ public final class WolfData {
      * applied. Used to tell our name apart from one the player set later with a vanilla Name Tag.
      */
     public static @Nullable String getBondName(Wolf wolf) {
-        CompoundTag root = wolf.getPersistentData().getCompoundOrEmpty(ROOT);
-        return root.getString(BOND_NAME).orElse(null);
+        return read(wolf).getString(BOND_NAME).orElse(null);
     }
 
     public static void setBondName(Wolf wolf, @Nullable String name) {
-        CompoundTag persistent = wolf.getPersistentData();
-        CompoundTag root = persistent.getCompoundOrEmpty(ROOT);
+        CompoundTag root = read(wolf);
         if (name == null) {
             root.remove(BOND_NAME);
         } else {
             root.putString(BOND_NAME, name);
         }
+        write(wolf, root);
+    }
+
+    /** Mode the wolf follows while it is not sitting: FOLLOW (default) or STAY_HOME. */
+    public static WolfMode getStandingMode(Wolf wolf) {
+        return WolfMode.STAY_HOME.id().equals(read(wolf).getString(STANDING_MODE).orElse(null))
+                ? WolfMode.STAY_HOME
+                : WolfMode.FOLLOW;
+    }
+
+    public static void setStandingMode(Wolf wolf, WolfMode mode) {
+        CompoundTag root = read(wolf);
+        if (mode == WolfMode.STAY_HOME) {
+            root.putString(STANDING_MODE, mode.id());
+        } else {
+            root.remove(STANDING_MODE); // FOLLOW is the default
+        }
+        write(wolf, root);
+    }
+
+    public static WolfStance getStance(Wolf wolf) {
+        return read(wolf).getString(STANCE).map(WolfStance::byId).orElse(WolfStance.DEFAULT);
+    }
+
+    public static void setStance(Wolf wolf, WolfStance stance) {
+        CompoundTag root = read(wolf);
+        if (stance == WolfStance.DEFAULT) {
+            root.remove(STANCE);
+        } else {
+            root.putString(STANCE, stance.id());
+        }
+        write(wolf, root);
+    }
+
+    private static CompoundTag read(Wolf wolf) {
+        return wolf.getPersistentData().getCompoundOrEmpty(ROOT);
+    }
+
+    private static void write(Wolf wolf, CompoundTag root) {
+        CompoundTag persistent = wolf.getPersistentData();
         if (root.isEmpty()) {
             persistent.remove(ROOT);
         } else {

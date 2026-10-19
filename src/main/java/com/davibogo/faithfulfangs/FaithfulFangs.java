@@ -7,6 +7,7 @@ import com.davibogo.faithfulfangs.registry.ModBlockEntities;
 import com.davibogo.faithfulfangs.registry.ModBlocks;
 import com.davibogo.faithfulfangs.registry.ModDataComponents;
 import com.davibogo.faithfulfangs.registry.ModItems;
+import com.davibogo.faithfulfangs.registry.ModMenuTypes;
 import com.mojang.logging.LogUtils;
 import java.util.List;
 import net.minecraft.world.item.CreativeModeTab;
@@ -44,13 +45,14 @@ public final class FaithfulFangs {
         ModItems.ITEMS.register(modBusGroup);
         ModBlockEntities.BLOCK_ENTITY_TYPES.register(modBusGroup);
         ModDataComponents.DATA_COMPONENTS.register(modBusGroup);
+        ModMenuTypes.MENU_TYPES.register(modBusGroup);
 
         FMLCommonSetupEvent.getBus(modBusGroup).addListener(this::commonSetup);
         BuildCreativeModeTabContentsEvent.BUS.addListener(FaithfulFangs::addCreativeTabItems);
         ModEvents.register();
         ModNetwork.init();
         if (FMLEnvironment.dist.isClient()) {
-            ClientSetup.register();
+            ClientSetup.register(modBusGroup);
         }
     }
 
