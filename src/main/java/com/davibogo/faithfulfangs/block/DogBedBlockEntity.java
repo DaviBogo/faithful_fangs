@@ -3,14 +3,19 @@ package com.davibogo.faithfulfangs.block;
 import com.davibogo.faithfulfangs.bond.Bond;
 import com.davibogo.faithfulfangs.bond.BondManager;
 import com.davibogo.faithfulfangs.registry.ModBlockEntities;
+import com.davibogo.faithfulfangs.registry.ModItems;
 import java.util.Objects;
 import java.util.UUID;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -64,7 +69,16 @@ public class DogBedBlockEntity extends BlockEntity {
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
         if (this.level instanceof ServerLevel serverLevel) {
-            BondManager.onBedRemoved(serverLevel, pos);
+            Bond bond = BondManager.onBedRemoved(serverLevel, pos);
+            if (bond != null) {
+                // The wolf lost its home: give back a blank tag and tell the owner.
+                Block.popResource(serverLevel, pos, new ItemStack(ModItems.DOG_TAG.get()));
+                ServerPlayer owner = serverLevel.getServer().getPlayerList().getPlayer(bond.ownerId());
+                if (owner != null) {
+                    owner.sendSystemMessage(Component.translatable("message.faithful_fangs.bed_destroyed", bond.wolfName())
+                            .withStyle(ChatFormatting.YELLOW));
+                }
+            }
         }
     }
 

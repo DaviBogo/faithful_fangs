@@ -1,6 +1,7 @@
 package com.davibogo.faithfulfangs;
 
-import com.davibogo.faithfulfangs.event.ServerEvents;
+import com.davibogo.faithfulfangs.event.ModEvents;
+import com.davibogo.faithfulfangs.network.ModNetwork;
 import com.davibogo.faithfulfangs.registry.ModBlockEntities;
 import com.davibogo.faithfulfangs.registry.ModBlocks;
 import com.davibogo.faithfulfangs.registry.ModDataComponents;
@@ -44,7 +45,8 @@ public final class FaithfulFangs {
 
         FMLCommonSetupEvent.getBus(modBusGroup).addListener(this::commonSetup);
         BuildCreativeModeTabContentsEvent.BUS.addListener(FaithfulFangs::addCreativeTabItems);
-        ServerEvents.register();
+        ModEvents.register();
+        ModNetwork.init();
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
