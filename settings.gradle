@@ -3,3 +3,19 @@ plugins {
 }
 
 rootProject.name = 'faithful_fangs'
+
+// Optional, machine-specific build directory. If a local.properties file (not committed)
+// sets buildDir, Gradle writes its output there instead of ./build. Used to keep the build
+// output outside folders that other tools watch, which can block Gradle from deleting it.
+def localProps = new Properties()
+def localPropsFile = new File(settingsDir, 'local.properties')
+if (localPropsFile.exists()) {
+    localPropsFile.withInputStream { localProps.load(it) }
+}
+def customBuildDir = localProps.getProperty('buildDir')
+if (customBuildDir) {
+    def buildDirFile = new File(settingsDir, customBuildDir).canonicalFile
+    gradle.beforeProject { project ->
+        project.layout.buildDirectory.set(buildDirFile)
+    }
+}
