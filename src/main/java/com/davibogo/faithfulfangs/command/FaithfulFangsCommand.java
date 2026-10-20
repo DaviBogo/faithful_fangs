@@ -7,7 +7,6 @@ import com.davibogo.faithfulfangs.bond.BondRegistry;
 import com.davibogo.faithfulfangs.bond.Recovery;
 import com.davibogo.faithfulfangs.item.EngravedTag;
 import com.davibogo.faithfulfangs.wolf.WolfData;
-import com.davibogo.faithfulfangs.wolf.WolfRecovery;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -38,7 +37,6 @@ import org.jspecify.annotations.Nullable;
  *   <li>{@code /faithfulfangs debug} — list all bonds and describe the wolf or Dog Bed you are looking at</li>
  *   <li>{@code /faithfulfangs debug bind <name>} — bind the wolf you are looking at to the nearest free Dog Bed</li>
  *   <li>{@code /faithfulfangs debug unbind} — remove the bond of the wolf or Dog Bed you are looking at</li>
- *   <li>{@code /faithfulfangs debug return} — every recovering wolf comes back to its bed now</li>
  * </ul>
  */
 public final class FaithfulFangsCommand {
@@ -58,9 +56,7 @@ public final class FaithfulFangsCommand {
                                         .executes(context -> bind(context.getSource(),
                                                 StringArgumentType.getString(context, "name")))))
                         .then(Commands.literal("unbind")
-                                .executes(context -> unbind(context.getSource())))
-                        .then(Commands.literal("return")
-                                .executes(context -> returnAll(context.getSource())))));
+                                .executes(context -> unbind(context.getSource())))));
     }
 
     private static int info(CommandSourceStack source) throws CommandSyntaxException {
@@ -76,12 +72,10 @@ public final class FaithfulFangsCommand {
                     + ", wolf " + (loaded ? "loaded" : "not loaded") + " [" + shortId(bond.wolfId()) + "]"));
         }
 
-        long now = server.overworld().getGameTime();
         if (!registry.recoveries().isEmpty()) {
-            send(source, header("Recovering: " + registry.recoveries().size()));
+            send(source, header("Waiting for their bed area to load: " + registry.recoveries().size()));
             for (Recovery recovery : registry.recoveries()) {
-                long seconds = Math.max(0L, recovery.returnTime() - now) / 20L;
-                send(source, Component.literal(" - " + recovery.wolfName() + ": back in " + seconds + " s"
+                send(source, Component.literal(" - " + recovery.wolfName()
                         + ", owner " + ownerName(server, recovery.ownerId())
                         + (registry.getByWolf(recovery.wolfId()) == null ? ", bed gone" : "")
                         + " [" + shortId(recovery.wolfId()) + "]"));
@@ -108,20 +102,6 @@ public final class FaithfulFangsCommand {
             send(source, Component.literal(" registry: " + (bond == null ? "free" : bond.wolfName() + " [" + shortId(bond.wolfId()) + "]")));
         }
         return 1;
-    }
-
-    private static int returnAll(CommandSourceStack source) {
-        MinecraftServer server = source.getServer();
-        int count = 0;
-        for (Recovery recovery : BondRegistry.get(server).recoveries()) {
-            if (WolfRecovery.returnNow(server, recovery.wolfId())) {
-                count++;
-            }
-        }
-        int returning = count;
-        source.sendSuccess(() -> Component.literal(returning == 0
-                ? "No wolf is recovering." : returning + " wolf(s) coming back within a second."), false);
-        return count;
     }
 
     private static int bind(CommandSourceStack source, String rawName) throws CommandSyntaxException {

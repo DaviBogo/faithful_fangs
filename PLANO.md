@@ -52,8 +52,8 @@ Minecraft 26.3 · Forge 66.0.13 · Java 25 · modid `faithful_fangs` · pacote `
 - Lobo **vinculado** que morre renasce na cama. Lobo sem cama morre de vez (vanilla).
 - Renasce com **meio coração** de vida e **não regenera sozinho**; precisa ser alimentado.
 - **Sem mudança visual** no lobo. A vida aparece **em corações no Painel do lobo**. O mod não desenha barra de vida sobre o lobo, para não conflitar com outros mods.
-- Volta depois de **5 minutos** ou quando o **dono dorme**, o que vier primeiro.
-- **Mensagens:** "Rex está ferido e voltará para casa em 5 minutos" e "Rex está de volta na cama".
+- Volta **imediatamente** depois da morte (mudado em 20/10/2026; antes eram 5 minutos ou quando o dono dormisse, mas assim valia mais a pena quebrar a cama e refazer o vínculo).
+- **Mensagem:** "Rex se machucou feio e está de volta na cama".
 - **Armadura:** continua no lobo, sem perda extra de durabilidade; só o desgaste normal pelos golpes (ver sistema 6).
 - **Técnico:** a área da cama é carregada só por um instante, no momento do respawn. Fora isso, nada fica carregado à toa; os dados do lobo ficam salvos com o mundo enquanto ele espera.
 
@@ -195,15 +195,14 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
   - Lobo sentado (Sit) continua parado, como no vanilla.
 
 ### Fase 2 — Respawn (em andamento)
-Detalhes definidos em 20/10/2026: ao voltar, o lobo fica em **Stay Home** (ferido, em casa, sem teleportar até o dono); se a cama for quebrada enquanto ele espera, ele **volta na hora** no lugar da cama, sem vínculo e sem nome (regra normal de cama quebrada), para nunca se perder um lobo por isso.
+Detalhes definidos em 20/10/2026: volta **imediatamente** depois da morte (os 5 minutos foram descartados após os testes); ao voltar, o lobo fica em **Stay Home** (ferido, em casa, sem teleportar até o dono); se a cama for quebrada enquanto ele espera, ele **volta na hora** no lugar da cama, sem vínculo e sem nome (regra normal de cama quebrada), para nunca se perder um lobo por isso.
 - [x] **1. Morte e volta para a cama** (`wolf/WolfRecovery`, dados em `bond/Recovery`):
-  - Lobo domesticado **com vínculo** que morre (qualquer causa, inclusive cair no vazio ou `/kill`) não morre: some numa nuvenzinha com um choro (o som do próprio lobo), sem drops nem a mensagem de morte vanilla. O dono recebe "Rex is hurt and will be back home in 5 minutes.". Lobo sem vínculo morre normalmente.
-  - O lobo inteiro (variante, coleira, armadura, nome, postura...) fica salvo no `bonds.dat` junto com a hora de voltar (tempo de jogo: 5 min = 6000 ticks, contando só com o jogo rodando). Nada fica carregado enquanto ele espera.
-  - **Volta** depois de 5 minutos, ou quando o dono dorme (a noite passa dormindo, ou o dono fica deitado tempo suficiente mesmo se a noite não passar). A área da cama é carregada por alguns segundos (o mesmo ticket curto que um portal usa); quando os mobs daquela área estão carregados, o lobo aparece em cima da cama, virado para a frente dela, com **meio coração** e em **Stay Home**, numa nuvenzinha com choro. O dono recebe "Rex is back in its bed.". Depois a área descarrega normalmente com o lobo salvo nela.
+  - Lobo domesticado **com vínculo** que morre (qualquer causa, inclusive cair no vazio ou `/kill`) não morre: some numa nuvenzinha com um choro (o som do próprio lobo), sem drops nem a mensagem de morte vanilla. Lobo sem vínculo morre normalmente.
+  - **Volta na hora** para a cama. Se a área da cama não está carregada, ela é carregada por alguns segundos (o mesmo ticket curto que um portal usa); enquanto isso o lobo inteiro (variante, coleira, armadura, nome, postura...) fica guardado no `bonds.dat`, então ele nunca se perde, nem se o jogo fechar nesse meio-tempo. Quando os mobs daquela área estão carregados, o lobo aparece em cima da cama, virado para a frente dela, com **meio coração** e em **Stay Home**, numa nuvenzinha com choro. O dono recebe "Rex was badly hurt and is back in its bed.". Depois a área descarrega normalmente com o lobo salvo nela.
   - Vale para cama em qualquer dimensão e com o dono longe, em outra dimensão ou offline (a mensagem só chega se ele estiver online).
-  - Se a cama mudou enquanto ele esperava (Dog Tag gravada usada em outra cama), ele volta para a cama nova. Se a cama foi quebrada, volta na hora no lugar dela ("Rex is back where its bed used to be.").
+  - Se a cama sumiu nesse meio-tempo (quebrada enquanto a área carregava), ele volta no lugar dela ("Rex was badly hurt and is back where its bed used to be.").
   - Vanilla já não regenera vida de lobo sozinho (só comendo), então "não regenera sozinho" já vale.
-  - **Comando de teste:** `/faithfulfangs debug` lista os lobos se recuperando e o tempo que falta; `/faithfulfangs debug return` faz todos voltarem na hora.
+  - **Comando de teste:** `/faithfulfangs debug` lista os lobos que ainda esperam a área da cama carregar (normalmente nenhum).
 
 ### Estrutura do código
 - `FaithfulFangs` — classe principal; registra os `DeferredRegister` e a aba criativa.

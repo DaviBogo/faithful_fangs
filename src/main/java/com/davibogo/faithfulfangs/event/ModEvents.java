@@ -27,7 +27,6 @@ import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.level.SleepFinishedTimeEvent;
 
 /** Listeners on the Forge (game) event buses. Some run on both logical sides. */
 public final class ModEvents {
@@ -51,7 +50,6 @@ public final class ModEvents {
         // Respawn: bonded wolves recover and come back to their bed.
         LivingDeathEvent.BUS.addListener((Predicate<LivingDeathEvent>) WolfRecovery::onDeath);
         TickEvent.ServerTickEvent.Post.BUS.addListener(WolfRecovery::onServerTick);
-        SleepFinishedTimeEvent.BUS.addListener(WolfRecovery::onSleepFinished);
     }
 
     /**

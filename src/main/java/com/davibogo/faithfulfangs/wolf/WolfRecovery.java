@@ -3,6 +3,7 @@ package com.davibogo.faithfulfangs.wolf;
 import com.davibogo.faithfulfangs.FaithfulFangs;
 import com.davibogo.faithfulfangs.block.DogBedBlock;
 import com.davibogo.faithfulfangs.bond.Bond;
+import com.davibogo.faithfulfangs.bond.BondManager;
 import com.davibogo.faithfulfangs.bond.BondRegistry;
 import com.davibogo.faithfulfangs.bond.Recovery;
 import com.davibogo.faithfulfangs.wolf.ai.PassiveNoTargetGoal;
@@ -34,24 +35,20 @@ import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.level.SleepFinishedTimeEvent;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Respawn (Phase 2): a bonded wolf that dies does not die. It vanishes in a puff, the owner is told
- * it is hurt, and the whole wolf is saved in the bond registry. It comes back to its bed after 5
- * minutes, or as soon as its owner sleeps, with half a heart, in Stay Home mode.
+ * Respawn (Phase 2): a bonded wolf that dies does not die. It vanishes in a puff and comes back to
+ * its bed right away, with half a heart, in Stay Home mode, and the owner is told.
  * <p>
- * Nothing stays loaded while it waits. When it comes back, the bed area is loaded for a moment
- * (the same short ticket a portal uses); the wolf is added there and then saved with that area
+ * If the bed area is not loaded, it is loaded for a moment (the same short ticket a portal uses);
+ * meanwhile the whole wolf is kept in the bond registry, so it is never lost, even if the game
+ * closes. Once the area's mobs are loaded the wolf is added there and later saved with that area
  * like any other mob.
  */
 public final class WolfRecovery {
-    public static final int RECOVERY_MINUTES = 5;
-    private static final long RECOVERY_TICKS = RECOVERY_MINUTES * 60L * 20L;
     /** Half a heart. */
     private static final float RETURN_HEALTH = 1.0F;
-    private static final int CHECK_INTERVAL = 20;
     /** Ask again for the bed area if it is still not loaded after this long. */
     private static final long LOADING_RETRY = 200L;
 
@@ -77,12 +74,8 @@ public final class WolfRecovery {
 
         prepareForRest(wolf);
         CompoundTag data = save(level, wolf);
-        long returnTime = server.overworld().getGameTime() + RECOVERY_TICKS;
-        registry.putRecovery(new Recovery(wolf.getUUID(), bond.ownerId(), bond.wolfName(), bond.bed(), returnTime, data));
+        registry.putRecovery(new Recovery(wolf.getUUID(), bond.ownerId(), bond.wolfName(), bond.bed(), data));
         wolf.discard();
-
-        tellOwner(server, bond.ownerId(),
-                Component.translatable("message.faithful_fangs.wolf_hurt", bond.wolfName(), RECOVERY_MINUTES));
         return true;
     }
 
@@ -114,59 +107,17 @@ public final class WolfRecovery {
 
     // ------------------------------------------------------------ return
 
-    /** Server tick listener: brings back the wolves whose time is up, or whose owner is sleeping. */
+    /** Server tick listener: brings the recovering wolves back as soon as their bed area is loaded. */
     public static void onServerTick(TickEvent.ServerTickEvent.Post event) {
         MinecraftServer server = event.server();
-        if (server.getTickCount() % CHECK_INTERVAL != 0) {
+        BondRegistry registry = BondRegistry.get(server);
+        if (registry.recoveries().isEmpty()) {
             return;
         }
-        BondRegistry registry = BondRegistry.get(server);
         long now = server.overworld().getGameTime();
         for (Recovery recovery : registry.recoveries()) {
-            if (isDue(server, registry, recovery, now)) {
-                tryReturn(server, registry, recovery, now);
-            }
+            tryReturn(server, registry, recovery, now);
         }
-    }
-
-    /** The night was skipped by sleeping: wolves of the owners who slept come back now. */
-    public static void onSleepFinished(SleepFinishedTimeEvent event) {
-        if (!(event.getLevel() instanceof ServerLevel level)) {
-            return;
-        }
-        MinecraftServer server = level.getServer();
-        for (ServerPlayer player : level.players()) {
-            if (player.isSleeping()) {
-                returnNowForOwner(server, player.getUUID());
-            }
-        }
-    }
-
-    private static void returnNowForOwner(MinecraftServer server, UUID ownerId) {
-        for (Recovery recovery : BondRegistry.get(server).recoveries()) {
-            if (recovery.ownerId().equals(ownerId)) {
-                returnNow(server, recovery.wolfId());
-            }
-        }
-    }
-
-    private static boolean isDue(MinecraftServer server, BondRegistry registry, Recovery recovery, long now) {
-        if (now >= recovery.returnTime() || registry.getByWolf(recovery.wolfId()) == null) {
-            return true; // time is up, or the bed is gone (it comes back where the bed was)
-        }
-        ServerPlayer owner = server.getPlayerList().getPlayer(recovery.ownerId());
-        return owner != null && owner.isSleepingLongEnough();
-    }
-
-    /** Makes a recovering wolf come back now (next check). Returns false if it is not recovering. */
-    public static boolean returnNow(MinecraftServer server, UUID wolfId) {
-        BondRegistry registry = BondRegistry.get(server);
-        Recovery recovery = registry.getRecovery(wolfId);
-        if (recovery == null) {
-            return false;
-        }
-        registry.putRecovery(recovery.withReturnTime(0L));
-        return true;
     }
 
     private static void tryReturn(MinecraftServer server, BondRegistry registry, Recovery recovery, long now) {
@@ -204,9 +155,12 @@ public final class WolfRecovery {
         wolf.resetFallDistance();
         wolf.clearFire();
         if (!level.addFreshEntity(wolf)) {
-            FaithfulFangs.LOGGER.error("Could not bring back {}: a wolf with the same id is already in the world", recovery.wolfName());
-            registry.removeRecovery(recovery.wolfId());
-            return;
+            if (BondManager.findLoadedWolf(server, recovery.wolfId()) != null) {
+                // It is already back (should not happen): keep that one.
+                FaithfulFangs.LOGGER.warn("{} is already in the world; dropping its saved copy", recovery.wolfName());
+                registry.removeRecovery(recovery.wolfId());
+            }
+            return; // otherwise try again next tick
         }
         registry.removeRecovery(recovery.wolfId());
 
