@@ -14,7 +14,7 @@ import net.minecraft.world.entity.animal.wolf.Wolf;
 
 /**
  * Replaces the vanilla wolf renderer. It draws wolves exactly like vanilla (same code as
- * WolfRenderer), except that an adult wolf asleep in its Dog Bed is drawn curled up.
+ * WolfRenderer), except that an adult wolf asleep in its Dog Bed is drawn curled up, eyes closed.
  * Puppies have no curled pose: they sleep sitting.
  */
 public class CurlingWolfRenderer extends AgeableMobRenderer<Wolf, WolfRenderState, WolfModel> {
@@ -57,6 +57,9 @@ public class CurlingWolfRenderer extends AgeableMobRenderer<Wolf, WolfRenderStat
         boolean asleep = WolfSleep.isSleeping(entity);
         if (state instanceof CurledWolfRenderState curledState) {
             curledState.curled = asleep && !state.isBaby;
+        }
+        if (asleep && !state.isBaby) {
+            state.texture = ClosedEyesTextures.INSTANCE.get(state.texture);
         }
         if (asleep && state.isBaby) {
             state.isSitting = true;
