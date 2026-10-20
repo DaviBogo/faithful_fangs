@@ -2,6 +2,7 @@ package com.davibogo.faithfulfangs.wolf;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -11,7 +12,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Node;
+import net.minecraft.world.level.pathfinder.NodeEvaluator;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
@@ -19,8 +22,9 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Safety rules for tamed wolves: no walking into fire, no jumping down cliffs, no leaping into
- * lava or over edges, and no teleporting next to a creeper.
+ * Safety rules for wolves: no walking into fire or lava, no jumping down cliffs, no leaping into
+ * lava or over edges, no fighting mobs that stand in fire, and no teleporting next to a creeper.
+ * "Hazard" below means fire, lava, magma blocks and lit campfires.
  */
 public final class WolfSafety {
     /** Wolves keep at least this far from creepers. A creeper explosion hurts up to about 6 blocks away. */
@@ -33,9 +37,102 @@ public final class WolfSafety {
     private WolfSafety() {
     }
 
-    /** Called when a wolf joins a level: never path into fire, onto magma blocks or lit campfires. */
+    /** How far ahead (blocks) the wolf's next steps are checked for a hazard. */
+    private static final double[] STEP_LOOK_AHEAD = {0.5, 0.9};
+
+    /**
+     * Called when a wolf joins a level: never path into fire, onto magma blocks or lit campfires,
+     * and avoid walking right next to fire or lava when there is another way.
+     */
     public static void applyPathfindingCosts(Mob wolf) {
         wolf.setPathfindingMalus(PathType.FIRE, -1.0F);
+        wolf.setPathfindingMalus(PathType.FIRE_IN_NEIGHBOR, 16.0F);
+    }
+
+    public static boolean isHazard(BlockState state) {
+        return NodeEvaluator.isBurningBlock(state) || state.getFluidState().is(FluidTags.LAVA);
+    }
+
+    /** True if a hazard is within {@code radius} blocks sideways of {@code pos}, from {@code dyMin} to {@code dyMax} blocks up. */
+    public static boolean isNearHazard(Level level, BlockPos pos, int radius, int dyMin, int dyMax) {
+        for (BlockPos p : BlockPos.betweenClosed(pos.offset(-radius, dyMin, -radius), pos.offset(radius, dyMax, radius))) {
+            if (isHazard(level.getBlockState(p))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** A mob that is burning, or standing in or right next to fire or lava: fighting it would set the wolf on fire. */
+    public static boolean isHazardousTarget(LivingEntity target) {
+        return target.isOnFire() || target.isInLava() || isNearHazard(target.level(), target.blockPosition(), 1, -1, 0);
+    }
+
+    /** True if the wolf is standing in or right next to a hazard, in powder snow, or next to a cactus or berry bush. */
+    public static boolean isInDanger(Mob mob) {
+        if (mob.isInLava() || mob.isInPowderSnow || isNearHazard(mob.level(), mob.blockPosition(), 1, -1, 0)) {
+            return true;
+        }
+        PathType type = WalkNodeEvaluator.getPathTypeStatic(mob, mob.blockPosition());
+        return type == PathType.DAMAGING || type == PathType.DAMAGING_IN_NEIGHBOR;
+    }
+
+    /**
+     * True if the wolf's next steps (where its path or its momentum takes it) end in fire or lava,
+     * or above lava or fire it would fall into. Checked every tick; the last line of defense when
+     * the path runs along a hazard on uneven ground, or the wolf gets pushed towards it.
+     */
+    public static boolean isHazardAhead(Mob mob) {
+        Vec3 motion = mob.getDeltaMovement();
+        if (isHazardAlong(mob, motion.x, motion.z)) {
+            return true;
+        }
+        Path path = mob.getNavigation().getPath();
+        if (path != null && !path.isDone()) {
+            Vec3 next = path.getNextEntityPos(mob);
+            return isHazardAlong(mob, next.x - mob.getX(), next.z - mob.getZ());
+        }
+        return false;
+    }
+
+    private static boolean isHazardAlong(Mob mob, double dx, double dz) {
+        double length = Math.sqrt(dx * dx + dz * dz);
+        if (length < 1.0E-3) {
+            return false;
+        }
+        dx /= length;
+        dz /= length;
+        double halfWidth = mob.getBbWidth() / 2.0;
+        int feetY = Mth.floor(mob.getY() + 0.01);
+        int maxDown = safeDrop(mob) + 1;
+        for (double ahead : STEP_LOOK_AHEAD) {
+            double x = mob.getX() + dx * ahead;
+            double z = mob.getZ() + dz * ahead;
+            for (int cx = -1; cx <= 1; cx += 2) {
+                for (int cz = -1; cz <= 1; cz += 2) {
+                    if (isHazardColumn(mob.level(), Mth.floor(x + cx * halfWidth), feetY, Mth.floor(z + cz * halfWidth), maxDown)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /** Looks down from the wolf's head height: a hazard before solid ground means danger. */
+    private static boolean isHazardColumn(Level level, int x, int feetY, int z, int maxDown) {
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        for (int y = feetY + 1; y >= feetY - maxDown; y--) {
+            pos.set(x, y, z);
+            BlockState state = level.getBlockState(pos);
+            if (isHazard(state)) {
+                return true;
+            }
+            if (!state.getCollisionShape(level, pos).isEmpty()) {
+                return false;
+            }
+        }
+        return false;
     }
 
     /** Highest drop (in blocks) the wolf can take without getting hurt. */
@@ -138,6 +235,10 @@ public final class WolfSafety {
     private static boolean canTeleportTo(TamableAnimal wolf, BlockPos pos) {
         Level level = wolf.level();
         if (WalkNodeEvaluator.getPathTypeStatic(wolf, pos) != PathType.WALKABLE) {
+            return false;
+        }
+        // Vanilla's check can miss lava when water is next to the spot too.
+        if (isNearHazard(level, pos, 1, -1, 1)) {
             return false;
         }
         if (level.getBlockState(pos.below()).getBlock() instanceof LeavesBlock) {

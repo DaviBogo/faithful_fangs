@@ -7,7 +7,6 @@ import com.davibogo.faithfulfangs.wolf.WolfStance;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
-import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.NeutralMob;
@@ -17,7 +16,6 @@ import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.LeapAtTargetGoal;
 import net.minecraft.world.entity.ai.goal.MoveTowardsRestrictionGoal;
-import net.minecraft.world.entity.ai.goal.PanicGoal;
 import net.minecraft.world.entity.ai.goal.SitWhenOrderedToGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
@@ -30,10 +28,11 @@ import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.monster.warden.Warden;
 
 /**
- * Adds the Faithful Fangs AI goals to every wolf. They only act on tamed wolves: stances
+ * Adds the Faithful Fangs AI goals to every wolf. Most only act on tamed wolves: stances
  * (Neutral keeps the vanilla goals as they are), modes (Follow uses a safer "follow owner", Stay
  * Home adds the home goals and turns off the vanilla goals that pull the wolf to its owner) and
- * safety (no cliff jumping, no unsafe leaps, keeping away from creepers, no walking into fire).
+ * safety (no cliff jumping, no unsafe leaps, no stepping into fire or lava, no fighting mobs in
+ * fire). Every wolf, wild or tamed, keeps away from creepers and gets out of fire calmly.
  */
 public final class WolfGoals {
     /** Target priority of the Aggressive goal: after the vanilla "defend owner" and "revenge" goals. */
@@ -70,10 +69,12 @@ public final class WolfGoals {
         // Safety.
         wolf.goalSelector.addGoal(1, new ModeGatedGoal(
                 new AvoidEntityGoal<>(wolf, Creeper.class, WolfSafety.CREEPER_DISTANCE, 1.2, 1.5),
-                () -> wolf.isTame() && !wolf.isOrderedToSit()));
-        // Added last on purpose: goals are tried in the order they were added, so this one sees the
-        // path any other goal has just made in the same tick, and stops it before the wolf moves.
+                () -> !wolf.isOrderedToSit()));
+        // Added last on purpose: goals are tried in the order they were added, so these see the
+        // path or target any other goal has just set in the same tick, and act before the wolf moves.
         wolf.goalSelector.addGoal(0, new LedgeGuardGoal(wolf));
+        wolf.goalSelector.addGoal(0, new StepGuardGoal(wolf));
+        wolf.targetSelector.addGoal(0, new HazardTargetGoal(wolf));
     }
 
     /**
@@ -81,7 +82,8 @@ public final class WolfGoals {
      * <ul>
      *   <li>follow owner (also teleports to the owner) — Follow mode only, and replaced by
      *       {@link SafeFollowOwnerGoal};</li>
-     *   <li>panic from fire/lava (also teleports to the owner) — replaced by a plain panic in Stay Home;</li>
+     *   <li>panic from fire, lava, cactus... — replaced by {@link FireEscapeGoal} (all wolves, all
+     *       modes; it teleports to the owner only in Follow mode);</li>
      *   <li>"sit when ordered", which also makes tamed wolves sit whenever the owner is offline or in
      *       another dimension — in Stay Home only when really ordered to sit.</li>
      * </ul>
@@ -99,10 +101,7 @@ public final class WolfGoals {
                 replace(wolf, priority, goal, new ModeGatedGoal(goal, () -> !wolf.isTame()
                         || wolf.getTarget() == null || WolfSafety.isSafeLeap(wolf, wolf.getTarget())));
             } else if (goal instanceof TamableAnimal.TamableAnimalPanicGoal) {
-                replace(wolf, priority, goal, new ModeGatedGoal(goal, following));
-                wolf.goalSelector.addGoal(priority, new ModeGatedGoal(
-                        new PanicGoal(wolf, 1.5, DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES),
-                        () -> !following.getAsBoolean()));
+                replace(wolf, priority, goal, new FireEscapeGoal(wolf));
             } else if (goal instanceof SitWhenOrderedToGoal) {
                 replace(wolf, priority, goal, new ModeGatedGoal(goal,
                         () -> following.getAsBoolean() || wolf.isOrderedToSit()));
@@ -118,8 +117,9 @@ public final class WolfGoals {
     /**
      * Aggressive stance: any hostile mob, before the owner attacks it. Skips creepers (wolves keep
      * away from them), calm neutral mobs (endermen, zombified piglins), piglins that are not
-     * hostile right now, mobs a wolf should never pick a fight with (warden, bosses), and mobs
-     * further below than the wolf can safely jump down.
+     * hostile right now, mobs a wolf should never pick a fight with (warden, bosses), mobs
+     * further below than the wolf can safely jump down, and mobs that are burning or standing in or
+     * next to fire or lava.
      */
     static boolean isAggressiveTarget(Wolf wolf, LivingEntity target) {
         if (!wolf.isTame() || wolf.isOrderedToSit() || WolfData.getStance(wolf) != WolfStance.AGGRESSIVE) {
@@ -133,7 +133,7 @@ public final class WolfGoals {
                 || target instanceof WitherBoss || target instanceof EnderDragon) {
             return false;
         }
-        if (target.getY() < wolf.getY() - WolfSafety.safeDrop(wolf)) {
+        if (target.getY() < wolf.getY() - WolfSafety.safeDrop(wolf) || WolfSafety.isHazardousTarget(target)) {
             return false;
         }
         if (target instanceof NeutralMob neutral && !neutral.isAngry()) {

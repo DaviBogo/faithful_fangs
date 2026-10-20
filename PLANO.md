@@ -188,8 +188,10 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
   - **Trava menos:** com o dono a mais de 5 blocos, o lobo que quase não se mexeu por 3 s (cerca, escada, beirada de água) ou que está sem caminho/nadando e não chegou mais perto em 5 s teleporta até o dono, sem esperar os 12 blocos do vanilla.
   - **Não pula de abismos** (`wolf/ai/LedgeGuardGoal`): no vanilla, um lobo brigando aceita quedas de 20+ blocos para alcançar o alvo. Agora, se os próximos passos do caminho têm uma queda que machuca (mais de 3 blocos, salvo se cair na água), ele para na beirada; se o mesmo alvo continuar fora de alcance por 5 s, desiste dele. O Aggressive também ignora monstros mais de 3 blocos abaixo dele.
   - **Pulo no alvo seguro:** o lobo domesticado só dá o pulo de ataque vanilla se o alvo não estiver mais baixo e o chão até ele for seguro (sem buraco, lava, fogo ou neve fofa).
-  - **Fogo:** nunca anda por fogo, blocos de magma ou fogueiras acesas (lava o vanilla já evitava).
-  - **Medo de creeper:** lobo domesticado e de pé (Follow ou Stay Home, até acordando se estiver dormindo) se afasta de creepers que estejam a menos de 8 blocos e à vista, correndo quando estão a menos de 7. Depois volta a seguir o dono normalmente.
+  - **Fogo e lava:** nunca anda por fogo, blocos de magma ou fogueiras acesas, e evita passar colado em fogo ou lava quando há outro caminho. Última defesa (`wolf/ai/StepGuardGoal`, a cada tick): se os próximos passos do lobo (pelo caminho ou pelo embalo, inclusive pulo ou empurrão) terminam em fogo ou lava, ou acima de lava/fogo onde ele cairia, ele para na hora. O teleporte também recusa lugares com fogo ou lava a 1 bloco (o teste vanilla falha quando há água do lado).
+  - **Não briga com mob no fogo** (`wolf/ai/HazardTargetGoal`): o lobo domesticado larga o alvo que está pegando fogo ou em cima/ao lado de fogo ou lava, e fica 3 s sem escolher alvo. O Aggressive também ignora esses mobs. (Ressalva: ele também não defende o dono de um zumbi queimando no sol.)
+  - **Sai do fogo com calma** (`wolf/ai/FireEscapeGoal`, todos os lobos, substitui o pânico vanilla que corria para lugares aleatórios, às vezes de volta para o fogo): no Follow, com o dono a 12+ blocos, teleporta até ele (lugar seguro); pegando fogo e com água a até 8 blocos, vai para a água; se está no perigo ou colado nele (fogo, lava, magma, neve fofa, cacto), anda até o lugar mais perto a pelo menos 2 blocos de fogo ou lava e fica lá até o fogo apagar.
+  - **Medo de creeper:** todo lobo de pé, selvagem ou domesticado (Follow ou Stay Home, até acordando se estiver dormindo), se afasta de creepers que estejam a menos de 8 blocos e à vista, correndo quando estão a menos de 7. Depois volta a seguir o dono normalmente.
   - Lobo sentado (Sit) continua parado, como no vanilla.
 
 ### Estrutura do código
@@ -209,6 +211,6 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 - `wolf/ai/PassiveNoTargetGoal`, `wolf/ai/PassiveFleeGoal` — IA das posturas.
 - `wolf/WolfHome`, `wolf/ai/HomeStateGoal`, `wolf/ai/ReturnHomeGoal`, `wolf/ai/SleepInBedGoal` — Stay Home (área de casa, retorno com teleporte, dormir).
 - `wolf/FollowAcrossDimensions` — lobos em Follow acompanham o dono entre dimensões.
-- `wolf/WolfSafety`, `wolf/ai/SafeFollowOwnerGoal`, `wolf/ai/LedgeGuardGoal` — segurança: seguir e teleportar com segurança, destravar, não pular de abismos, pulo de ataque seguro, fogo e creepers.
+- `wolf/WolfSafety`, `wolf/ai/SafeFollowOwnerGoal`, `wolf/ai/LedgeGuardGoal`, `wolf/ai/StepGuardGoal`, `wolf/ai/HazardTargetGoal`, `wolf/ai/FireEscapeGoal` — segurança: seguir e teleportar com segurança, destravar, não pular de abismos, pulo de ataque seguro, fogo, lava e creepers.
 - `wolf/WolfSleep`, `client/wolf/*` — estado de sono, o renderizador e os modelos do lobo deitado (adulto e filhote) e as texturas de olhos fechados.
 - `command/FaithfulFangsCommand` — `/faithfulfangs debug`.
