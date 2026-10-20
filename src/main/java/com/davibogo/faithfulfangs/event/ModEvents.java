@@ -8,6 +8,7 @@ import com.davibogo.faithfulfangs.menu.WolfPanelMenu;
 import com.davibogo.faithfulfangs.registry.ModItems;
 import com.davibogo.faithfulfangs.wolf.FollowAcrossDimensions;
 import com.davibogo.faithfulfangs.wolf.WolfHome;
+import com.davibogo.faithfulfangs.wolf.WolfRecovery;
 import com.davibogo.faithfulfangs.wolf.ai.WolfGoals;
 import java.util.function.Predicate;
 import net.minecraft.core.component.DataComponents;
@@ -20,10 +21,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.level.SleepFinishedTimeEvent;
 
 /** Listeners on the Forge (game) event buses. Some run on both logical sides. */
 public final class ModEvents {
@@ -43,6 +47,11 @@ public final class ModEvents {
         PlayerEvent.Clone.BUS.addListener(FollowAcrossDimensions::onClone);
         PlayerEvent.PlayerRespawnEvent.BUS.addListener(FollowAcrossDimensions::onRespawn);
         PlayerEvent.PlayerLoggedOutEvent.BUS.addListener(FollowAcrossDimensions::onLoggedOut);
+
+        // Respawn: bonded wolves recover and come back to their bed.
+        LivingDeathEvent.BUS.addListener((Predicate<LivingDeathEvent>) WolfRecovery::onDeath);
+        TickEvent.ServerTickEvent.Post.BUS.addListener(WolfRecovery::onServerTick);
+        SleepFinishedTimeEvent.BUS.addListener(WolfRecovery::onSleepFinished);
     }
 
     /**

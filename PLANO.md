@@ -147,7 +147,7 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 
 ## Progresso da implementação
 
-### Fase 1 — Cama, plaquinha, vínculo e modos (em andamento)
+### Fase 1 — Cama, plaquinha, vínculo e modos (concluída em 20/10/2026)
 - [x] **1. Textos em inglês:** descrição do `mods.toml` e mensagem de log traduzidas; faixa de versão do Minecraft corrigida no `mods.toml` (`[26.3,26.4)`).
 - [x] **2. Dog Tag** (`faithful_fangs:dog_tag`): item com dois estados, em branco e gravada. O estado gravado fica no componente de dados `faithful_fangs:engraved_tag` (UUID do lobo + nome). Textura própria para cada estado, tooltip explicando o uso, receita (desbloqueada no livro de receitas ao pegar uma pepita de ferro) e entrada na aba Ferramentas e Utilidades, logo depois da Name Tag.
 - [x] **3. Dog Bed** (`faithful_fangs:<cor>_dog_bed`, 16 cores): cama de 1 bloco, baixa e larga (redesenhada em 19/10/2026 para o lobo deitar enrolado): almofada de 2 px, bordas de 2 px de espessura no fundo (4 px de altura) e nas laterais (3 px), frente aberta; 12 × 14 px livres por dentro. Usa a textura da lã da mesma cor. O lado aberto fica virado para quem coloca. Receita `W_W` / `WWW` com lã da mesma cor (livro de receitas desbloqueia ao pegar a lã), dropa a si mesma, empilha até 1 como as camas vanilla e aparece em Blocos Funcionais logo depois das camas vanilla. A block entity `faithful_fangs:dog_bed` já guarda o UUID e o nome do lobo e sincroniza com o cliente (ainda sem uso).
@@ -194,6 +194,17 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
   - **Medo de creeper:** todo lobo de pé, selvagem ou domesticado (Follow ou Stay Home, até acordando se estiver dormindo), se afasta de creepers que estejam a menos de 8 blocos e à vista, correndo quando estão a menos de 7. Depois volta a seguir o dono normalmente.
   - Lobo sentado (Sit) continua parado, como no vanilla.
 
+### Fase 2 — Respawn (em andamento)
+Detalhes definidos em 20/10/2026: ao voltar, o lobo fica em **Stay Home** (ferido, em casa, sem teleportar até o dono); se a cama for quebrada enquanto ele espera, ele **volta na hora** no lugar da cama, sem vínculo e sem nome (regra normal de cama quebrada), para nunca se perder um lobo por isso.
+- [x] **1. Morte e volta para a cama** (`wolf/WolfRecovery`, dados em `bond/Recovery`):
+  - Lobo domesticado **com vínculo** que morre (qualquer causa, inclusive cair no vazio ou `/kill`) não morre: some numa nuvenzinha com um choro (o som do próprio lobo), sem drops nem a mensagem de morte vanilla. O dono recebe "Rex is hurt and will be back home in 5 minutes.". Lobo sem vínculo morre normalmente.
+  - O lobo inteiro (variante, coleira, armadura, nome, postura...) fica salvo no `bonds.dat` junto com a hora de voltar (tempo de jogo: 5 min = 6000 ticks, contando só com o jogo rodando). Nada fica carregado enquanto ele espera.
+  - **Volta** depois de 5 minutos, ou quando o dono dorme (a noite passa dormindo, ou o dono fica deitado tempo suficiente mesmo se a noite não passar). A área da cama é carregada por alguns segundos (o mesmo ticket curto que um portal usa); quando os mobs daquela área estão carregados, o lobo aparece em cima da cama, virado para a frente dela, com **meio coração** e em **Stay Home**, numa nuvenzinha com choro. O dono recebe "Rex is back in its bed.". Depois a área descarrega normalmente com o lobo salvo nela.
+  - Vale para cama em qualquer dimensão e com o dono longe, em outra dimensão ou offline (a mensagem só chega se ele estiver online).
+  - Se a cama mudou enquanto ele esperava (Dog Tag gravada usada em outra cama), ele volta para a cama nova. Se a cama foi quebrada, volta na hora no lugar dela ("Rex is back where its bed used to be.").
+  - Vanilla já não regenera vida de lobo sozinho (só comendo), então "não regenera sozinho" já vale.
+  - **Comando de teste:** `/faithfulfangs debug` lista os lobos se recuperando e o tempo que falta; `/faithfulfangs debug return` faz todos voltarem na hora.
+
 ### Estrutura do código
 - `FaithfulFangs` — classe principal; registra os `DeferredRegister` e a aba criativa.
 - `registry/ModBlocks`, `registry/ModItems`, `registry/ModBlockEntities`, `registry/ModDataComponents` — registros.
@@ -213,4 +224,5 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 - `wolf/FollowAcrossDimensions` — lobos em Follow acompanham o dono entre dimensões.
 - `wolf/WolfSafety`, `wolf/ai/SafeFollowOwnerGoal`, `wolf/ai/LedgeGuardGoal`, `wolf/ai/StepGuardGoal`, `wolf/ai/HazardTargetGoal`, `wolf/ai/FireEscapeGoal` — segurança: seguir e teleportar com segurança, destravar, não pular de abismos, pulo de ataque seguro, fogo, lava e creepers.
 - `wolf/WolfSleep`, `client/wolf/*` — estado de sono, o renderizador e os modelos do lobo deitado (adulto e filhote) e as texturas de olhos fechados.
+- `wolf/WolfRecovery`, `bond/Recovery` — respawn: lobo vinculado que morre se recupera e volta para a cama.
 - `command/FaithfulFangsCommand` — `/faithfulfangs debug`.
