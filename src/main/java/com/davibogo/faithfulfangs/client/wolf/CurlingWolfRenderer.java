@@ -1,7 +1,6 @@
 package com.davibogo.faithfulfangs.client.wolf;
 
 import com.davibogo.faithfulfangs.wolf.WolfSleep;
-import net.minecraft.client.model.animal.wolf.BabyWolfModel;
 import net.minecraft.client.model.animal.wolf.WolfModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.AgeableMobRenderer;
@@ -14,13 +13,13 @@ import net.minecraft.world.entity.animal.wolf.Wolf;
 
 /**
  * Replaces the vanilla wolf renderer. It draws wolves exactly like vanilla (same code as
- * WolfRenderer), except that an adult wolf asleep in its Dog Bed is drawn curled up, eyes closed.
- * Puppies have no curled pose: they sleep sitting.
+ * WolfRenderer), except that a wolf asleep in its Dog Bed is drawn lying in it with its eyes closed
+ * (adults curled up, puppies lying with the head beside the paws).
  */
 public class CurlingWolfRenderer extends AgeableMobRenderer<Wolf, WolfRenderState, WolfModel> {
     public CurlingWolfRenderer(EntityRendererProvider.Context context) {
         super(context, new CurlingAdultWolfModel(context.bakeLayer(ModelLayers.WOLF)),
-                new BabyWolfModel(context.bakeLayer(ModelLayers.WOLF_BABY)), 0.5F);
+                new CurlingBabyWolfModel(context.bakeLayer(ModelLayers.WOLF_BABY)), 0.5F);
         this.addLayer(new CurlingWolfArmorLayer(this, context.getModelSet(), context.getEquipmentRenderer()));
         this.addLayer(new WolfCollarLayer(this));
     }
@@ -56,13 +55,10 @@ public class CurlingWolfRenderer extends AgeableMobRenderer<Wolf, WolfRenderStat
 
         boolean asleep = WolfSleep.isSleeping(entity);
         if (state instanceof CurledWolfRenderState curledState) {
-            curledState.curled = asleep && !state.isBaby;
+            curledState.curled = asleep;
         }
-        if (asleep && !state.isBaby) {
-            state.texture = ClosedEyesTextures.INSTANCE.get(state.texture);
-        }
-        if (asleep && state.isBaby) {
-            state.isSitting = true;
+        if (asleep) {
+            state.texture = ClosedEyesTextures.INSTANCE.get(state.texture, state.isBaby);
         }
     }
 }
