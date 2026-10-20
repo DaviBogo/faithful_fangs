@@ -1,7 +1,8 @@
 package com.davibogo.faithfulfangs.wolf.ai;
 
+import com.davibogo.faithfulfangs.wolf.WolfData;
+import com.davibogo.faithfulfangs.wolf.WolfMode;
 import java.util.EnumSet;
-import java.util.List;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -11,22 +12,33 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Passive stance: when the wolf was just hurt by something, or a mob is targeting it, it runs away
- * until it is far enough. It never fights back.
+ * Passive stance: the wolf never fights back; it runs away for as long as it is being hunted.
+ * <p>
+ * A threat is something that hurt the wolf in the last few seconds or a mob whose target is the
+ * wolf. The wolf keeps fleeing while the threat is still after it (up to {@link #DANGER_DISTANCE}),
+ * and at least until it is {@link #SAFE_DISTANCE} away. In Follow mode it also teleports to its
+ * owner once it is far from them, like the vanilla wolf panic does, so fast or teleporting
+ * hunters (endermen) cannot corner it.
  */
 public class PassiveFleeGoal extends Goal {
     /** How long a hit is remembered as a reason to flee (ticks). */
     private static final int HURT_MEMORY_TICKS = 100;
-    private static final double HUNTER_SCAN_RADIUS = 10.0;
+    /** Mobs targeting the wolf are noticed within this radius. */
+    private static final double HUNTER_SCAN_RADIUS = 24.0;
+    /** While the threat is still hunting the wolf, keep fleeing up to this distance. */
+    private static final double DANGER_DISTANCE = 32.0;
+    /** Even if the threat gives up, keep running until at least this far. */
     private static final double SAFE_DISTANCE = 16.0;
     private static final double SPEED = 1.5;
-    /** Scan for mobs targeting the wolf only every few ticks. */
     private static final int SCAN_INTERVAL = 10;
+    /** Pick a new escape point this often even if the current one was not reached (ticks). */
+    private static final int REPATH_INTERVAL = 20;
 
     private final Wolf wolf;
     private @Nullable LivingEntity threat;
     private @Nullable Vec3 fleeTo;
     private int scanCooldown;
+    private int repathCooldown;
 
     public PassiveFleeGoal(Wolf wolf) {
         this.wolf = wolf;
@@ -38,28 +50,50 @@ public class PassiveFleeGoal extends Goal {
         if (!PassiveNoTargetGoal.isPassive(this.wolf) || this.wolf.isOrderedToSit()) {
             return false;
         }
-        this.threat = this.findThreat();
-        return this.threat != null && this.pickFleePosition();
+        this.threat = this.findThreat(false);
+        return this.threat != null;
     }
 
     @Override
     public boolean canContinueToUse() {
-        return PassiveNoTargetGoal.isPassive(this.wolf)
-                && !this.wolf.isOrderedToSit()
-                && this.threat != null
-                && this.threat.isAlive()
-                && this.wolf.distanceToSqr(this.threat) < SAFE_DISTANCE * SAFE_DISTANCE;
+        if (!PassiveNoTargetGoal.isPassive(this.wolf) || this.wolf.isOrderedToSit() || !this.isPresent(this.threat)) {
+            return false;
+        }
+        double distanceSqr = this.wolf.distanceToSqr(this.threat);
+        if (this.isHunting(this.threat)) {
+            return distanceSqr < DANGER_DISTANCE * DANGER_DISTANCE;
+        }
+        return distanceSqr < SAFE_DISTANCE * SAFE_DISTANCE;
+    }
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
     }
 
     @Override
     public void start() {
-        this.moveToFleePosition();
+        this.repathCooldown = 0;
+        this.flee();
     }
 
     @Override
     public void tick() {
-        if (this.wolf.getNavigation().isDone() && this.pickFleePosition()) {
-            this.moveToFleePosition();
+        // Someone else may have started hunting the wolf, or hit it again.
+        LivingEntity newest = this.findThreat(true);
+        if (newest != null) {
+            this.threat = newest;
+        }
+
+        // Follow mode: run to the owner when far from them (vanilla panic does the same).
+        if (WolfData.getStandingMode(this.wolf) == WolfMode.FOLLOW
+                && !this.wolf.unableToMoveToOwner() && this.wolf.shouldTryTeleportToOwner()) {
+            this.wolf.tryToTeleportToOwner();
+            this.repathCooldown = 0;
+        }
+
+        if (--this.repathCooldown <= 0 || this.wolf.getNavigation().isDone()) {
+            this.flee();
         }
     }
 
@@ -70,22 +104,38 @@ public class PassiveFleeGoal extends Goal {
         this.wolf.getNavigation().stop();
     }
 
-    private @Nullable LivingEntity findThreat() {
+    private void flee() {
+        this.repathCooldown = REPATH_INTERVAL;
+        if (this.threat == null) {
+            return;
+        }
+        this.fleeTo = DefaultRandomPos.getPosAway(this.wolf, 16, 7, this.threat.position());
+        if (this.fleeTo == null) {
+            // Cornered: any reachable spot is better than standing still.
+            this.fleeTo = DefaultRandomPos.getPos(this.wolf, 10, 7);
+        }
+        if (this.fleeTo != null) {
+            this.wolf.getNavigation().moveTo(this.fleeTo.x, this.fleeTo.y, this.fleeTo.z, SPEED);
+        }
+    }
+
+    /**
+     * The last attacker if it hit the wolf recently, otherwise the nearest mob targeting the wolf.
+     * The area scan only runs every {@link #SCAN_INTERVAL} ticks.
+     */
+    private @Nullable LivingEntity findThreat(boolean onlyNewHit) {
         LivingEntity attacker = this.wolf.getLastHurtByMob();
-        if (attacker != null && attacker.isAlive() && !this.wolf.isOwnedBy(attacker)
-                && this.wolf.tickCount - this.wolf.getLastHurtByMobTimestamp() < HURT_MEMORY_TICKS) {
+        if (this.isPresent(attacker) && this.recentlyHurtBy(attacker)) {
             return attacker;
         }
-        if (--this.scanCooldown > 0) {
+        if (onlyNewHit || --this.scanCooldown > 0) {
             return null;
         }
         this.scanCooldown = SCAN_INTERVAL;
-        List<Mob> hunters = this.wolf.level().getEntitiesOfClass(Mob.class,
-                this.wolf.getBoundingBox().inflate(HUNTER_SCAN_RADIUS),
-                mob -> mob.isAlive() && mob.getTarget() == this.wolf);
         LivingEntity nearest = null;
         double nearestDistance = Double.MAX_VALUE;
-        for (Mob hunter : hunters) {
+        for (Mob hunter : this.wolf.level().getEntitiesOfClass(Mob.class,
+                this.wolf.getBoundingBox().inflate(HUNTER_SCAN_RADIUS), this::isHunting)) {
             double distance = this.wolf.distanceToSqr(hunter);
             if (distance < nearestDistance) {
                 nearestDistance = distance;
@@ -95,17 +145,19 @@ public class PassiveFleeGoal extends Goal {
         return nearest;
     }
 
-    private boolean pickFleePosition() {
-        if (this.threat == null) {
-            return false;
-        }
-        this.fleeTo = DefaultRandomPos.getPosAway(this.wolf, 16, 7, this.threat.position());
-        return this.fleeTo != null;
+    /** Still after the wolf: hit it recently, or has it as target. */
+    private boolean isHunting(@Nullable LivingEntity entity) {
+        return this.isPresent(entity)
+                && (this.recentlyHurtBy(entity) || entity instanceof Mob mob && mob.getTarget() == this.wolf);
     }
 
-    private void moveToFleePosition() {
-        if (this.fleeTo != null) {
-            this.wolf.getNavigation().moveTo(this.fleeTo.x, this.fleeTo.y, this.fleeTo.z, SPEED);
-        }
+    private boolean recentlyHurtBy(LivingEntity entity) {
+        return entity == this.wolf.getLastHurtByMob()
+                && this.wolf.tickCount - this.wolf.getLastHurtByMobTimestamp() < HURT_MEMORY_TICKS;
+    }
+
+    /** Alive, in the same level, and not the owner (an accidental hit from the owner is no threat). */
+    private boolean isPresent(@Nullable LivingEntity entity) {
+        return entity != null && entity.isAlive() && entity.level() == this.wolf.level() && !this.wolf.isOwnedBy(entity);
     }
 }
