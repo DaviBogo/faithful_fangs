@@ -117,9 +117,9 @@ public final class WolfGoals {
     /**
      * Aggressive stance: any hostile mob, before the owner attacks it. Skips creepers (wolves keep
      * away from them), calm neutral mobs (endermen, zombified piglins), piglins that are not
-     * hostile right now, mobs a wolf should never pick a fight with (warden, bosses), mobs
-     * further below than the wolf can safely jump down, and mobs that are burning or standing in or
-     * next to fire or lava.
+     * hostile right now, mobs a wolf should never pick a fight with (warden, bosses), and mobs
+     * further below than the wolf can safely jump down. Mobs that are burning or next to fire or
+     * lava are fair game: an Aggressive wolf takes the risk of catching fire.
      */
     static boolean isAggressiveTarget(Wolf wolf, LivingEntity target) {
         if (!wolf.isTame() || wolf.isOrderedToSit() || WolfData.getStance(wolf) != WolfStance.AGGRESSIVE) {
@@ -133,7 +133,7 @@ public final class WolfGoals {
                 || target instanceof WitherBoss || target instanceof EnderDragon) {
             return false;
         }
-        if (target.getY() < wolf.getY() - WolfSafety.safeDrop(wolf) || WolfSafety.isHazardousTarget(target)) {
+        if (target.getY() < wolf.getY() - WolfSafety.safeDrop(wolf)) {
             return false;
         }
         if (target instanceof NeutralMob neutral && !neutral.isAngry()) {

@@ -3,6 +3,7 @@ package com.davibogo.faithfulfangs.wolf.ai;
 import com.davibogo.faithfulfangs.wolf.WolfData;
 import com.davibogo.faithfulfangs.wolf.WolfMode;
 import com.davibogo.faithfulfangs.wolf.WolfSafety;
+import com.davibogo.faithfulfangs.wolf.WolfStance;
 import java.util.EnumSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.DamageTypeTags;
@@ -22,7 +23,8 @@ import org.jspecify.annotations.Nullable;
  * random spots, sometimes back into the fire, over and over. Instead the wolf:
  * <ul>
  *   <li>(Follow mode, owner 12+ blocks away) teleports to a safe spot by its owner, like vanilla;</li>
- *   <li>if it is burning and there is water within 8 blocks, goes into the water;</li>
+ *   <li>if it is burning and there is water within 8 blocks, goes into the water (an Aggressive
+ *       wolf in a fight keeps fighting instead);</li>
  *   <li>if it stands in or right next to the danger, walks to the nearest spot at least 2 blocks
  *       away from any fire or lava, and stays there until the fire on it goes out.</li>
  * </ul>
@@ -55,7 +57,7 @@ public class FireEscapeGoal extends Goal {
             return false;
         }
         this.path = null;
-        if (this.wolf.isOnFire() && !this.wolf.isInLava() && !this.wolf.isInWater()) {
+        if (this.wolf.isOnFire() && !this.wolf.isInLava() && !this.wolf.isInWater() && !this.isFightingBravely()) {
             this.path = this.findPath(this.wolf.level(), WATER_SEARCH, true);
         }
         if (this.path == null && WolfSafety.isInDanger(this.wolf)) {
@@ -80,6 +82,11 @@ public class FireEscapeGoal extends Goal {
     @Override
     public void stop() {
         this.path = null;
+    }
+
+    private boolean isFightingBravely() {
+        return this.wolf.isTame() && this.wolf.getTarget() != null
+                && WolfData.getStance(this.wolf) == WolfStance.AGGRESSIVE;
     }
 
     private boolean isHurtByEnvironment() {
