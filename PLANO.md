@@ -181,6 +181,7 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
   - **Dormir:** à noite (Overworld) o lobo vai até a cama e deita nela (pose sentada, porque o lobo vanilla não tem animação de dormir). Levanta de manhã, se tiver alvo para brigar ou se apanhar. Se não alcançar a cama em 30 s, tenta de novo 1 min depois.
   - **Objetivos vanilla desligados no Stay Home:** seguir o dono (que também teleporta até ele), o pânico com fogo/lava que teleporta até o dono (vira um pânico comum) e o "sentar" automático que o vanilla faz quando o dono está offline ou em outra dimensão (no Stay Home só senta se mandado).
   - Não abre portas (lobos vanilla não abrem).
+- [x] **Follow entre dimensões** (pedido em 19/10/2026): quando o dono troca de dimensão (Nether, End ou qualquer dimensão de outro mod), os lobos que o seguem vão junto e aparecem ao lado dele. Vale para lobos em Follow, de pé, sem guia nem montaria, a até 24 blocos do dono no momento da viagem. Cobre portais, teletransporte por comando e a primeira saída do End (créditos).
 - [ ] **8d. Melhorias do Follow:** evitar perigos, travar menos, medo de creeper.
 
 ### Estrutura do código
@@ -199,4 +200,5 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 - `wolf/ai/WolfGoals` — instala a IA do mod em todo lobo e condiciona objetivos vanilla ao modo (`wolf/ai/ModeGatedGoal`).
 - `wolf/ai/PassiveNoTargetGoal`, `wolf/ai/PassiveFleeGoal` — IA das posturas.
 - `wolf/WolfHome`, `wolf/ai/HomeStateGoal`, `wolf/ai/ReturnHomeGoal`, `wolf/ai/SleepInBedGoal` — Stay Home (área de casa, retorno com teleporte, dormir).
+- `wolf/FollowAcrossDimensions` — lobos em Follow acompanham o dono entre dimensões.
 - `command/FaithfulFangsCommand` — `/faithfulfangs debug`.

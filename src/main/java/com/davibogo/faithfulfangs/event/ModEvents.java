@@ -6,6 +6,7 @@ import com.davibogo.faithfulfangs.item.DogTagItem;
 import com.davibogo.faithfulfangs.item.EngravedTag;
 import com.davibogo.faithfulfangs.menu.WolfPanelMenu;
 import com.davibogo.faithfulfangs.registry.ModItems;
+import com.davibogo.faithfulfangs.wolf.FollowAcrossDimensions;
 import com.davibogo.faithfulfangs.wolf.WolfHome;
 import com.davibogo.faithfulfangs.wolf.ai.WolfGoals;
 import java.util.function.Predicate;
@@ -20,6 +21,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
 /** Listeners on the Forge (game) event buses. Some run on both logical sides. */
@@ -33,6 +36,13 @@ public final class ModEvents {
         PlayerInteractEvent.EntityInteractSpecific.BUS.addListener(
                 (Predicate<PlayerInteractEvent.EntityInteractSpecific>) ModEvents::onEntityInteract);
         RegisterCommandsEvent.BUS.addListener(ModEvents::onRegisterCommands);
+
+        // Follow mode across dimensions.
+        EntityTravelToDimensionEvent.BUS.addListener(FollowAcrossDimensions::onTravelToDimension);
+        PlayerEvent.PlayerChangedDimensionEvent.BUS.addListener(FollowAcrossDimensions::onChangedDimension);
+        PlayerEvent.Clone.BUS.addListener(FollowAcrossDimensions::onClone);
+        PlayerEvent.PlayerRespawnEvent.BUS.addListener(FollowAcrossDimensions::onRespawn);
+        PlayerEvent.PlayerLoggedOutEvent.BUS.addListener(FollowAcrossDimensions::onLoggedOut);
     }
 
     /**
