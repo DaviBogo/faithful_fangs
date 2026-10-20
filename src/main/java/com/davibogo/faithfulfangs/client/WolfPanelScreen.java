@@ -36,6 +36,7 @@ public class WolfPanelScreen extends AbstractContainerScreen<WolfPanelMenu> {
     private static final int HEIGHT = 150;
     /** Vanilla container label color. */
     private static final int LABEL_COLOR = 0xFF404040;
+    private static final int SLEEPING_COLOR = 0xFF3F5FA0;
     private static final int RIGHT_COLUMN_X = 68;
     private static final int MODE_LABEL_Y = 78;
     private static final int MODE_BUTTONS_Y = 88;
@@ -140,6 +141,10 @@ public class WolfPanelScreen extends AbstractContainerScreen<WolfPanelMenu> {
     @Override
     protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         graphics.text(this.font, this.title, this.titleLabelX, this.titleLabelY, LABEL_COLOR, false);
+        if (this.menu.isSleeping()) {
+            Component sleeping = Component.translatable("screen.faithful_fangs.wolf_panel.sleeping");
+            graphics.text(this.font, sleeping, this.imageWidth - 8 - this.font.width(sleeping), this.titleLabelY, SLEEPING_COLOR, false);
+        }
         this.extractHearts(graphics);
         this.extractBed(graphics);
         graphics.text(this.font, Component.translatable("screen.faithful_fangs.wolf_panel.mode"),

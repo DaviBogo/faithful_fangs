@@ -21,7 +21,7 @@ import org.jspecify.annotations.Nullable;
  */
 public class DogBedRenderer implements BlockEntityRenderer<DogBedBlockEntity, DogBedRenderer.State> {
     /** Where the label is anchored, relative to the bed's block corner (vanilla adds 0.5 above it). */
-    private static final Vec3 NAME_ATTACHMENT = new Vec3(0.5, 0.45, 0.5);
+    private static final Vec3 NAME_ATTACHMENT = new Vec3(0.5, 0.4, 0.5);
 
     public DogBedRenderer(BlockEntityRendererProvider.Context context) {
     }

@@ -1,17 +1,21 @@
 package com.davibogo.faithfulfangs.wolf.ai;
 
+import com.davibogo.faithfulfangs.block.DogBedBlock;
 import com.davibogo.faithfulfangs.bond.Bond;
 import com.davibogo.faithfulfangs.wolf.WolfHome;
+import com.davibogo.faithfulfangs.wolf.WolfSleep;
 import java.util.EnumSet;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.animal.wolf.Wolf;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Stay Home at night: the wolf goes to its bed and lies down on it (wolves have no sleeping
- * animation, so it uses the sitting pose). It gets up in the morning, when it has a target to
- * fight, or when something hurts it.
+ * Stay Home at night: the wolf goes to its bed, lies down in the middle of it facing the open side,
+ * and curls up asleep (see {@link WolfSleep}; the curled pose is drawn by the client renderer).
+ * It gets up in the morning, when it has a target to fight, or when something hurts it.
  */
 public class SleepInBedGoal extends Goal {
     /** Close enough to the bed center to lie down (blocks). */
@@ -24,8 +28,10 @@ public class SleepInBedGoal extends Goal {
     private static final int RECENT_HURT_TICKS = 100;
 
     private final Wolf wolf;
+    private @Nullable BlockPos bedPos;
     private @Nullable Vec3 bed;
     private boolean lying;
+    private float sleepYaw;
     private int approachTicks;
     private int cooldown;
 
@@ -47,7 +53,8 @@ public class SleepInBedGoal extends Goal {
         if (home == null || !WolfHome.isInHomeDimension(this.wolf, home) || !this.wolf.isWithinHome()) {
             return false;
         }
-        this.bed = WolfHome.bedSurface(home.bed().pos());
+        this.bedPos = home.bed().pos();
+        this.bed = WolfHome.bedSurface(this.bedPos);
         return true;
     }
 
@@ -70,14 +77,16 @@ public class SleepInBedGoal extends Goal {
 
     @Override
     public void tick() {
-        if (this.lying || this.bed == null) {
+        if (this.bed == null) {
+            return;
+        }
+        if (this.lying) {
+            this.holdStill();
             return;
         }
         double distance = Math.sqrt(this.horizontalDistanceSqr(this.bed));
         if (distance <= LIE_DOWN_DISTANCE) {
-            this.wolf.getNavigation().stop();
-            this.wolf.setInSittingPose(true);
-            this.lying = true;
+            this.lieDown();
             return;
         }
         if (++this.approachTicks > MAX_APPROACH_TICKS) {
@@ -95,11 +104,32 @@ public class SleepInBedGoal extends Goal {
 
     @Override
     public void stop() {
-        if (this.lying) {
-            this.wolf.setInSittingPose(false);
-        }
+        WolfSleep.setSleeping(this.wolf, false);
         this.lying = false;
         this.bed = null;
+        this.bedPos = null;
+    }
+
+    /** Settles in the middle of the bed, facing its open side, and curls up. */
+    private void lieDown() {
+        this.wolf.getNavigation().stop();
+        this.sleepYaw = this.wolf.getYRot();
+        if (this.bedPos != null) {
+            BlockState state = this.wolf.level().getBlockState(this.bedPos);
+            if (state.getBlock() instanceof DogBedBlock) {
+                this.sleepYaw = state.getValue(DogBedBlock.FACING).toYRot();
+            }
+        }
+        this.wolf.snapTo(this.bed.x, this.wolf.getY(), this.bed.z, this.sleepYaw, 0.0F);
+        this.holdStill();
+        WolfSleep.setSleeping(this.wolf, true);
+        this.lying = true;
+    }
+
+    private void holdStill() {
+        this.wolf.setYRot(this.sleepYaw);
+        this.wolf.setYBodyRot(this.sleepYaw);
+        this.wolf.setYHeadRot(this.sleepYaw);
     }
 
     /** Night, Stay Home, not told to sit, nothing to fight, not just hurt. */

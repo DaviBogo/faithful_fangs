@@ -22,19 +22,21 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Dog Bed: a one-block cushion with a raised rim. Its open (low) side faces the player who placed it.
+ * Dog Bed: a low one-block cushion with a rim on three sides. Its open side faces the player who placed it.
  * The block entity keeps which wolf the bed belongs to.
  */
 public class DogBedBlock extends BaseEntityBlock {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    /** Shape for a bed facing north (opening on the north side); matches models/block/dog_bed.json. */
+    /**
+     * Shape for a bed facing north (open on the north side); matches models/block/dog_bed.json.
+     * Low and wide so a wolf can curl up on the cushion: 12 x 14 px inside.
+     */
     private static final Map<Direction, VoxelShape> SHAPES = Shapes.rotateHorizontal(Shapes.or(
-            Block.box(1, 0, 1, 15, 3, 15),   // cushion
-            Block.box(1, 3, 12, 15, 7, 15),  // back rim
-            Block.box(1, 3, 1, 4, 6, 12),    // left rim
-            Block.box(12, 3, 1, 15, 6, 12),  // right rim
-            Block.box(4, 3, 1, 12, 4, 3)     // front lip
+            Block.box(0, 0, 0, 16, 2, 16),   // cushion
+            Block.box(0, 2, 14, 16, 6, 16),  // back rim
+            Block.box(0, 2, 0, 2, 5, 14),    // left rim
+            Block.box(14, 2, 0, 16, 5, 14)   // right rim
     ));
 
     private final DyeColor color;

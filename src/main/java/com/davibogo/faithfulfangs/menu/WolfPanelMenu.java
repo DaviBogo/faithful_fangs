@@ -6,6 +6,7 @@ import com.davibogo.faithfulfangs.registry.ModMenuTypes;
 import com.davibogo.faithfulfangs.wolf.WolfCommands;
 import com.davibogo.faithfulfangs.wolf.WolfData;
 import com.davibogo.faithfulfangs.wolf.WolfMode;
+import com.davibogo.faithfulfangs.wolf.WolfSleep;
 import com.davibogo.faithfulfangs.wolf.WolfStance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -39,7 +40,8 @@ public class WolfPanelMenu extends AbstractContainerMenu {
     private static final int DATA_MODE = 2;
     private static final int DATA_STANCE = 3;
     private static final int DATA_HAS_BED = 4;
-    private static final int DATA_COUNT = 5;
+    private static final int DATA_SLEEPING = 5;
+    private static final int DATA_COUNT = 6;
 
     private static final double MAX_DISTANCE_SQR = 8.0 * 8.0;
 
@@ -68,6 +70,7 @@ public class WolfPanelMenu extends AbstractContainerMenu {
                     case DATA_MODE -> WolfMode.current(wolf).ordinal();
                     case DATA_STANCE -> WolfData.getStance(wolf).ordinal();
                     case DATA_HAS_BED -> WolfCommands.hasBed(server, wolf) ? 1 : 0;
+                    case DATA_SLEEPING -> WolfSleep.isSleeping(wolf) ? 1 : 0;
                     default -> 0;
                 };
             }
@@ -167,5 +170,10 @@ public class WolfPanelMenu extends AbstractContainerMenu {
 
     public boolean hasBed() {
         return this.data.get(DATA_HAS_BED) != 0;
+    }
+
+    /** Curled up asleep in its Dog Bed (Stay Home at night). */
+    public boolean isSleeping() {
+        return this.data.get(DATA_SLEEPING) != 0;
     }
 }

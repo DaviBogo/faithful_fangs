@@ -22,8 +22,8 @@ import org.jspecify.annotations.Nullable;
 public final class WolfHome {
     /** Radius around the bed where a Stay Home wolf wanders and defends. */
     public static final int HOME_RADIUS = 10;
-    /** Height of the bed cushion: where the wolf lands when it teleports home. */
-    private static final double BED_SURFACE = 3.0 / 16.0;
+    /** Height of the bed cushion: where the wolf lands and sleeps. */
+    private static final double BED_SURFACE = 2.0 / 16.0;
 
     private WolfHome() {
     }
