@@ -26,6 +26,7 @@ public final class WolfCommands {
                 setSitting(wolf, false);
             }
         }
+        WolfHome.updateHome(wolf);
         return true;
     }
 

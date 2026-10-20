@@ -13,6 +13,8 @@ public final class WolfData {
     private static final String BOND_NAME = "bond_name";
     private static final String STANDING_MODE = "standing_mode";
     private static final String STANCE = "stance";
+    private static final String RETURNING = "returning";
+    private static final String HOME_APPLIED = "home_applied";
 
     private WolfData() {
     }
@@ -62,6 +64,34 @@ public final class WolfData {
             root.remove(STANCE);
         } else {
             root.putString(STANCE, stance.id());
+        }
+        write(wolf, root);
+    }
+
+    /** True while the wolf walks/teleports back to its bed (it is invulnerable meanwhile). */
+    public static boolean isReturning(Wolf wolf) {
+        return read(wolf).getBooleanOr(RETURNING, false);
+    }
+
+    public static void setReturning(Wolf wolf, boolean returning) {
+        setFlag(wolf, RETURNING, returning);
+    }
+
+    /** True if the wolf's vanilla "home" restriction was set by this mod (Stay Home). */
+    public static boolean isHomeApplied(Wolf wolf) {
+        return read(wolf).getBooleanOr(HOME_APPLIED, false);
+    }
+
+    public static void setHomeApplied(Wolf wolf, boolean applied) {
+        setFlag(wolf, HOME_APPLIED, applied);
+    }
+
+    private static void setFlag(Wolf wolf, String key, boolean value) {
+        CompoundTag root = read(wolf);
+        if (value) {
+            root.putBoolean(key, true);
+        } else {
+            root.remove(key);
         }
         write(wolf, root);
     }

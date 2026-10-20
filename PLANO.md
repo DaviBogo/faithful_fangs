@@ -175,7 +175,12 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
   - **Neutral:** vanilla, sem mudanças.
   - **Aggressive:** ataca qualquer mob hostil (interface `Enemy`) ao alcance, mesmo antes do dono, desde que consiga ver e chegar até ele. Ignora creepers (medo de creeper vem no 8d), endermen e zombified piglins calmos, piglins que não estão hostis, warden, wither e dragão. Lobo sentado não ataca.
   - Trocar para Passive no meio de uma briga faz o lobo parar na hora.
-- [ ] **8c. Stay Home:** passeio no raio, defesa, dormir à noite, retorno com teleporte e invulnerabilidade.
+- [x] **8c. Stay Home:**
+  - **Área de casa:** usa a restrição vanilla de "home" dos mobs, centrada na cama com raio 10. Com ela, o passeio aleatório vanilla fica dentro da área e o lobo só escolhe/briga com alvos dentro dela (é assim que defende a casa sem sair correndo atrás de monstros). Alvos que saem da área (+2 blocos) são largados. Fora da área (até 24 blocos) ele volta andando.
+  - **Retorno:** mais longe que 24 blocos, ou em outra dimensão: anda ~5 s (para a cama se houver caminho, senão para longe do dono) e teleporta para cima da cama, em qualquer dimensão. Fica invulnerável durante o retorno (invulnerabilidade temporária renovada a cada tick, então some sozinha se algo interromper). A área de chegada fica carregada por alguns segundos (ticket de portal vanilla) e depois descarrega normalmente com o lobo salvo nela. Nuvenzinha de partículas na saída e na chegada.
+  - **Dormir:** à noite (Overworld) o lobo vai até a cama e deita nela (pose sentada, porque o lobo vanilla não tem animação de dormir). Levanta de manhã, se tiver alvo para brigar ou se apanhar. Se não alcançar a cama em 30 s, tenta de novo 1 min depois.
+  - **Objetivos vanilla desligados no Stay Home:** seguir o dono (que também teleporta até ele), o pânico com fogo/lava que teleporta até o dono (vira um pânico comum) e o "sentar" automático que o vanilla faz quando o dono está offline ou em outra dimensão (no Stay Home só senta se mandado).
+  - Não abre portas (lobos vanilla não abrem).
 - [ ] **8d. Melhorias do Follow:** evitar perigos, travar menos, medo de creeper.
 
 ### Estrutura do código
@@ -191,5 +196,7 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 - `client/DogBedRenderer`, `client/ClientSetup` — nome flutuante sobre a cama e registros só do cliente.
 - `menu/WolfPanelMenu`, `client/WolfPanelScreen`, `registry/ModMenuTypes` — Painel do lobo (textura em `textures/gui/wolf_panel.png`).
 - `wolf/WolfMode`, `wolf/WolfStance`, `wolf/WolfCommands` — modos, posturas e a aplicação deles no lobo.
-- `wolf/ai/WolfGoals`, `wolf/ai/PassiveNoTargetGoal`, `wolf/ai/PassiveFleeGoal` — IA das posturas.
+- `wolf/ai/WolfGoals` — instala a IA do mod em todo lobo e condiciona objetivos vanilla ao modo (`wolf/ai/ModeGatedGoal`).
+- `wolf/ai/PassiveNoTargetGoal`, `wolf/ai/PassiveFleeGoal` — IA das posturas.
+- `wolf/WolfHome`, `wolf/ai/HomeStateGoal`, `wolf/ai/ReturnHomeGoal`, `wolf/ai/SleepInBedGoal` — Stay Home (área de casa, retorno com teleporte, dormir).
 - `command/FaithfulFangsCommand` — `/faithfulfangs debug`.

@@ -6,6 +6,7 @@ import com.davibogo.faithfulfangs.item.DogTagItem;
 import com.davibogo.faithfulfangs.item.EngravedTag;
 import com.davibogo.faithfulfangs.menu.WolfPanelMenu;
 import com.davibogo.faithfulfangs.registry.ModItems;
+import com.davibogo.faithfulfangs.wolf.WolfHome;
 import com.davibogo.faithfulfangs.wolf.ai.WolfGoals;
 import java.util.function.Predicate;
 import net.minecraft.core.component.DataComponents;
@@ -42,6 +43,7 @@ public final class ModEvents {
         if (event.getLevel() instanceof ServerLevel level && event.getEntity() instanceof Wolf wolf) {
             WolfGoals.install(wolf);
             BondManager.syncWolf(level.getServer(), wolf);
+            WolfHome.onJoin(wolf);
         }
     }
 
