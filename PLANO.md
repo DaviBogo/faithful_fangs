@@ -173,7 +173,7 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 - [x] **8b. Posturas** (objetivos de IA adicionados a todo lobo ao entrar no mundo; só agem em lobos domesticados):
   - **Passive:** um objetivo de alvo com prioridade máxima impede todos os ataques vanilla (defender o dono, revidar, caçar esqueletos) e zera alvo e raiva. O lobo foge **enquanto estiver sendo caçado**: ameaça é quem bateu nele nos últimos 5 s ou um mob que está mirando nele (detectado num raio de 24 blocos). Continua fugindo enquanto a ameaça o perseguir (até 32 blocos) e, no mínimo, até ficar a 16 blocos; troca de ameaça se outro mob atacar; encurralado, corre para qualquer lugar. No modo Follow, quando fica a mais de 12 blocos do dono, teleporta até ele (como o pânico vanilla) — única forma de escapar de endermen. Golpe do próprio dono não conta. (Ajustado em 19/10/2026: antes o lobo parava de fugir cedo demais.)
   - **Neutral:** vanilla, sem mudanças.
-  - **Aggressive:** ataca qualquer mob hostil (interface `Enemy`) ao alcance, mesmo antes do dono, desde que consiga ver e chegar até ele. Ignora creepers (medo de creeper vem no 8d), endermen e zombified piglins calmos, piglins que não estão hostis, warden, wither e dragão. Lobo sentado não ataca.
+  - **Aggressive:** ataca qualquer mob hostil (interface `Enemy`) ao alcance, mesmo antes do dono, desde que consiga ver e chegar até ele. Ignora creepers (foge deles, ver 8d), endermen e zombified piglins calmos, piglins que não estão hostis, warden, wither e dragão. Lobo sentado não ataca.
   - Trocar para Passive no meio de uma briga faz o lobo parar na hora.
 - [x] **8c. Stay Home:**
   - **Área de casa:** usa a restrição vanilla de "home" dos mobs, centrada na cama com raio 10. Com ela, o passeio aleatório vanilla fica dentro da área e o lobo só escolhe/briga com alvos dentro dela (é assim que defende a casa sem sair correndo atrás de monstros). Alvos que saem da área (+2 blocos) são largados. Fora da área (até 24 blocos) ele volta andando.
@@ -183,7 +183,14 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
   - **Objetivos vanilla desligados no Stay Home:** seguir o dono (que também teleporta até ele), o pânico com fogo/lava que teleporta até o dono (vira um pânico comum) e o "sentar" automático que o vanilla faz quando o dono está offline ou em outra dimensão (no Stay Home só senta se mandado).
   - Não abre portas (lobos vanilla não abrem).
 - [x] **Follow entre dimensões** (pedido em 19/10/2026): quando o dono troca de dimensão (Nether, End ou qualquer dimensão de outro mod), os lobos que o seguem vão junto e aparecem ao lado dele. Vale para lobos em Follow, de pé, sem guia nem montaria, a até 24 blocos do dono no momento da viagem. Cobre portais, teletransporte por comando e a primeira saída do End (créditos).
-- [ ] **8d. Melhorias do Follow:** evitar perigos, travar menos, medo de creeper.
+- [x] **8d. Melhorias do Follow e segurança:**
+  - **Seguir mais seguro** (`wolf/ai/SafeFollowOwnerGoal`, substitui o "seguir o dono" vanilla no Follow): mesmas distâncias do vanilla (começa a seguir a 10 blocos, para a 2, teleporta a partir de 12). O teleporte só vai para lugares seguros: os mesmos testes do vanilla (chão firme, sem fogo ou lava do lado, sem folhas, espaço livre) e nunca a menos de 8 blocos de um creeper. Se não achar lugar seguro, continua andando até o dono.
+  - **Trava menos:** com o dono a mais de 5 blocos, o lobo que quase não se mexeu por 3 s (cerca, escada, beirada de água) ou que está sem caminho/nadando e não chegou mais perto em 5 s teleporta até o dono, sem esperar os 12 blocos do vanilla.
+  - **Não pula de abismos** (`wolf/ai/LedgeGuardGoal`): no vanilla, um lobo brigando aceita quedas de 20+ blocos para alcançar o alvo. Agora, se os próximos passos do caminho têm uma queda que machuca (mais de 3 blocos, salvo se cair na água), ele para na beirada; se o mesmo alvo continuar fora de alcance por 5 s, desiste dele. O Aggressive também ignora monstros mais de 3 blocos abaixo dele.
+  - **Pulo no alvo seguro:** o lobo domesticado só dá o pulo de ataque vanilla se o alvo não estiver mais baixo e o chão até ele for seguro (sem buraco, lava, fogo ou neve fofa).
+  - **Fogo:** nunca anda por fogo, blocos de magma ou fogueiras acesas (lava o vanilla já evitava).
+  - **Medo de creeper:** lobo domesticado e de pé (Follow ou Stay Home, até acordando se estiver dormindo) se afasta de creepers que estejam a menos de 8 blocos e à vista, correndo quando estão a menos de 7. Depois volta a seguir o dono normalmente.
+  - Lobo sentado (Sit) continua parado, como no vanilla.
 
 ### Estrutura do código
 - `FaithfulFangs` — classe principal; registra os `DeferredRegister` e a aba criativa.
@@ -202,5 +209,6 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 - `wolf/ai/PassiveNoTargetGoal`, `wolf/ai/PassiveFleeGoal` — IA das posturas.
 - `wolf/WolfHome`, `wolf/ai/HomeStateGoal`, `wolf/ai/ReturnHomeGoal`, `wolf/ai/SleepInBedGoal` — Stay Home (área de casa, retorno com teleporte, dormir).
 - `wolf/FollowAcrossDimensions` — lobos em Follow acompanham o dono entre dimensões.
+- `wolf/WolfSafety`, `wolf/ai/SafeFollowOwnerGoal`, `wolf/ai/LedgeGuardGoal` — segurança: seguir e teleportar com segurança, destravar, não pular de abismos, pulo de ataque seguro, fogo e creepers.
 - `wolf/WolfSleep`, `client/wolf/*` — estado de sono, o renderizador e os modelos do lobo deitado (adulto e filhote) e as texturas de olhos fechados.
 - `command/FaithfulFangsCommand` — `/faithfulfangs debug`.
