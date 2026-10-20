@@ -194,7 +194,7 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
   - **Medo de creeper:** todo lobo de pé, selvagem ou domesticado (Follow ou Stay Home, até acordando se estiver dormindo), se afasta de creepers que estejam a menos de 8 blocos e à vista, correndo quando estão a menos de 7. Depois volta a seguir o dono normalmente.
   - Lobo sentado (Sit) continua parado, como no vanilla.
 
-### Fase 2 — Respawn (em andamento)
+### Fase 2 — Respawn (concluída em 20/10/2026)
 Detalhes definidos em 20/10/2026: volta **imediatamente** depois da morte (os 5 minutos foram descartados após os testes); ao voltar, o lobo fica em **Stay Home** (ferido, em casa, sem teleportar até o dono); se a cama for quebrada enquanto ele espera, ele **volta na hora** no lugar da cama, sem vínculo e sem nome (regra normal de cama quebrada), para nunca se perder um lobo por isso.
 - [x] **1. Morte e volta para a cama** (`wolf/WolfRecovery`, dados em `bond/Recovery`):
   - Lobo domesticado **com vínculo** que morre (qualquer causa, inclusive cair no vazio ou `/kill`) não morre: some numa nuvenzinha com um choro (o som do próprio lobo), sem drops nem a mensagem de morte vanilla. Lobo sem vínculo morre normalmente.
@@ -204,10 +204,19 @@ Detalhes definidos em 20/10/2026: volta **imediatamente** depois da morte (os 5 
   - Vanilla já não regenera vida de lobo sozinho (só comendo), então "não regenera sozinho" já vale.
   - **Comando de teste:** `/faithfulfangs debug` lista os lobos que ainda esperam a área da cama carregar (normalmente nenhum).
 
+### Fase 3 — Faro (em andamento)
+Etapas: (1) os três ossos especiais; (2) as listas de achados em JSON (data pack); (3) o faro em si (o lobo encontrar, entregar e latir).
+- [x] **1. Ossos especiais** (`item/SpecialBoneItem`, registrados em `registry/ModItems`):
+  - **Ancient Bone** (Overworld, raridade incomum, nome amarelo), **Blazing Bone** (Nether, rara, nome azul-claro, não queima no fogo nem na lava, como o netherite) e **Ethereal Bone** (End, épica, nome roxo).
+  - Texturas próprias 16x16 (`textures/item/*_bone.png`): osso envelhecido com musgo, osso incandescente com rachaduras brilhando e osso lilás com brilhos ciano. Seguram na mão como o osso vanilla.
+  - Tooltip cinza dizendo onde o osso é encontrado (por exemplo "Sniffed out by wolves in the Overworld"). O uso (melhorias, sistema 5) entra no tooltip na fase 4.
+  - Ficam na aba criativa **Ingredientes**, logo depois do osso vanilla. Ainda não têm receita nem outra forma de obter; virão do faro.
+
 ### Estrutura do código
 - `FaithfulFangs` — classe principal; registra os `DeferredRegister` e a aba criativa.
 - `registry/ModBlocks`, `registry/ModItems`, `registry/ModBlockEntities`, `registry/ModDataComponents` — registros.
 - `item/DogTagItem`, `item/EngravedTag` — plaquinha e o componente de gravação.
+- `item/SpecialBoneItem` — ossos especiais (Ancient, Blazing e Ethereal Bone).
 - `block/DogBedBlock`, `block/DogBedBlockEntity` — cama e os dados do vínculo guardados nela.
 - `bond/Bond`, `bond/BondRegistry`, `bond/BondManager` — vínculo, registro global e todas as operações (vincular, desvincular, renomear, sincronizar cópias).
 - `wolf/WolfData` — dados do mod guardados no lobo.

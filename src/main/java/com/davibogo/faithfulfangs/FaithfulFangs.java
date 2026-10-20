@@ -65,6 +65,14 @@ public final class FaithfulFangs {
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             // Dog Tag right after the vanilla Name Tag.
             event.getEntries().putAfter(new ItemStack(Items.NAME_TAG), new ItemStack(ModItems.DOG_TAG.get()), visibility);
+        } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
+            // Special bones right after the vanilla Bone.
+            ItemStack previous = new ItemStack(Items.BONE);
+            for (var bone : List.of(ModItems.ANCIENT_BONE, ModItems.BLAZING_BONE, ModItems.ETHEREAL_BONE)) {
+                ItemStack stack = new ItemStack(bone.get());
+                event.getEntries().putAfter(previous, stack, visibility);
+                previous = stack;
+            }
         } else if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             // Dog Beds right after the vanilla beds (the straw bed is the last one).
             ItemStack previous = new ItemStack(Items.STRAW_BED);
