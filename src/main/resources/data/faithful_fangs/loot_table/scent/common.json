@@ -1,0 +1,39 @@
+{
+  "type": "minecraft:gift",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/nether",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "dimension": "minecraft:the_nether"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/end",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "dimension": "minecraft:the_end"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -211,6 +211,16 @@ Etapas: (1) os três ossos especiais; (2) as listas de achados em JSON (data pac
   - Texturas próprias 16x16 (`textures/item/*_bone.png`): osso envelhecido com musgo, osso incandescente com rachaduras brilhando e osso lilás com brilhos ciano. Seguram na mão como o osso vanilla.
   - Tooltip cinza dizendo onde o osso é encontrado (por exemplo "Sniffed out by wolves in the Overworld"). O uso (melhorias, sistema 5) entra no tooltip na fase 4.
   - Ficam na aba criativa **Ingredientes**, logo depois do osso vanilla. Ainda não têm receita nem outra forma de obter; virão do faro.
+- [x] **2. Listas de achados** (loot tables em `data/faithful_fangs/loot_table/scent/`, do tipo `minecraft:gift`, o mesmo do presente matinal do gato; editáveis por data pack):
+  - Entradas: `faithful_fangs:scent/common` (achado comum) e `faithful_fangs:scent/rare` (osso especial: Blazing Bone no Nether, Ethereal Bone no End, Ancient Bone no Overworld e em qualquer outra dimensão).
+  - O achado comum usa a **primeira lista que servir** para o lugar onde o lobo está: dimensão → estrutura → bioma de caverna → subterrâneo (sem céu e abaixo de y 40; abaixo de y 0 é o "profundo") → bioma de superfície → lista geral da dimensão.
+  - **Overworld:** estruturas (cidade antiga, câmaras do desafio, mina abandonada, vila); cavernas (deep dark, lush caves, dripstone caves, sulfur caves, subterrâneo, subterrâneo profundo); biomas (campos de cogumelo, cerejeiras, jardim pálido, floresta escura, pântano, selva, badlands, deserto, savana, neve, taiga, floresta, planícies e prado, montanhas, praia, rio, oceano); geral.
+  - **Nether:** fortaleza, bastião, floresta carmesim, floresta distorcida, vale das almas, deltas de basalto, geral (inclui Nether Wastes).
+  - **End:** cidade do End, geral.
+  - A lista geral do Overworld tem drops dos mobs que nascem em quase todo lugar (osso, linha, pena, carne podre, pólvora, flecha, olho de aranha e, raramente, ender pearl). Quase toda lista de bioma também puxa dela; campos de cogumelo e deep dark não, porque lá não nascem monstros. As listas de caverna puxam da lista do subterrâneo (minérios e drops de monstros).
+  - Os biomas são reconhecidos por tags (`#minecraft:is_forest`, `#c:is_snowy`...), então biomas de outros mods que usam essas tags caem na lista certa.
+  - Exemplos de chance por achado: diamante 1,6% no subterrâneo profundo; ender pearl 1,3% na lista geral do Overworld; blaze rod 13% na fortaleza; chave do desafio 3,2% nas câmaras do desafio; esmeralda 4,1% na vila.
+  - **Teste:** `/loot give @s loot faithful_fangs:scent/common` sorteia um achado para o lugar onde você está (`.../rare` sorteia o osso especial; também dá para sortear uma lista direto, como `faithful_fangs:scent/overworld/desert`).
 
 ### Estrutura do código
 - `FaithfulFangs` — classe principal; registra os `DeferredRegister` e a aba criativa.

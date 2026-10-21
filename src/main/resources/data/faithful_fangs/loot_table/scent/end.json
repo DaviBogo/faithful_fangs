@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:gift",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/end/end_city",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "structures": "minecraft:end_city"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/end/default"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

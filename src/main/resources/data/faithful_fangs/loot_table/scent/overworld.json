@@ -1,0 +1,332 @@
+{
+  "type": "minecraft:gift",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/ancient_city",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "structures": "minecraft:ancient_city"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/trial_chambers",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "structures": "minecraft:trial_chambers"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/mineshaft",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "structures": "#minecraft:mineshaft"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/village",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "structures": "#minecraft:village"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/deep_dark",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "minecraft:deep_dark"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/lush_caves",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "minecraft:lush_caves"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/dripstone_caves",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "minecraft:dripstone_caves"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/sulfur_caves",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "minecraft:sulfur_caves"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/deep_underground",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "position": {
+                    "y": {
+                      "max": 0
+                    }
+                  },
+                  "can_see_sky": false
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/underground",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "position": {
+                    "y": {
+                      "max": 40
+                    }
+                  },
+                  "can_see_sky": false
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/mushroom_fields",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "#c:is_mushroom"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/cherry_grove",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "minecraft:cherry_grove"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/pale_garden",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "minecraft:pale_garden"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/dark_forest",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "#c:is_dark_forest"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/swamp",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "#c:is_swamp"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/jungle",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "#minecraft:is_jungle"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/badlands",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "#minecraft:is_badlands"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/desert",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "#c:is_desert"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/savanna",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "#minecraft:is_savanna"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/snowy",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "#c:is_snowy"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/taiga",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "#minecraft:is_taiga"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/forest",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "#minecraft:is_forest"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/plains",
+              "condition": {
+                "type": "minecraft:any_of",
+                "terms": [
+                  {
+                    "type": "minecraft:location_check",
+                    "predicate": {
+                      "biomes": "#c:is_plains"
+                    }
+                  },
+                  {
+                    "type": "minecraft:location_check",
+                    "predicate": {
+                      "biomes": "minecraft:meadow"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/mountains",
+              "condition": {
+                "type": "minecraft:any_of",
+                "terms": [
+                  {
+                    "type": "minecraft:location_check",
+                    "predicate": {
+                      "biomes": "#minecraft:is_mountain"
+                    }
+                  },
+                  {
+                    "type": "minecraft:location_check",
+                    "predicate": {
+                      "biomes": "#minecraft:is_hill"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/beach",
+              "condition": {
+                "type": "minecraft:any_of",
+                "terms": [
+                  {
+                    "type": "minecraft:location_check",
+                    "predicate": {
+                      "biomes": "#minecraft:is_beach"
+                    }
+                  },
+                  {
+                    "type": "minecraft:location_check",
+                    "predicate": {
+                      "biomes": "minecraft:stony_shore"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/river",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "#minecraft:is_river"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/ocean",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "#minecraft:is_ocean"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/overworld/default"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

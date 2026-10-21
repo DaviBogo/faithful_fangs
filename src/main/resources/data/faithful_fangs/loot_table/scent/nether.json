@@ -1,0 +1,79 @@
+{
+  "type": "minecraft:gift",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/nether/fortress",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "structures": "minecraft:fortress"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/nether/bastion_remnant",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "structures": "minecraft:bastion_remnant"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/nether/crimson_forest",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "minecraft:crimson_forest"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/nether/warped_forest",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "minecraft:warped_forest"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/nether/soul_sand_valley",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "minecraft:soul_sand_valley"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/nether/basalt_deltas",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "biomes": "minecraft:basalt_deltas"
+                }
+              }
+            },
+            {
+              "type": "minecraft:loot_table",
+              "value": "faithful_fangs:scent/nether/default"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

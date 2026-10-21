@@ -1,0 +1,39 @@
+{
+  "type": "minecraft:gift",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "name": "faithful_fangs:blazing_bone",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "dimension": "minecraft:the_nether"
+                }
+              }
+            },
+            {
+              "type": "minecraft:item",
+              "name": "faithful_fangs:ethereal_bone",
+              "condition": {
+                "type": "minecraft:location_check",
+                "predicate": {
+                  "dimension": "minecraft:the_end"
+                }
+              }
+            },
+            {
+              "type": "minecraft:item",
+              "name": "faithful_fangs:ancient_bone"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
