@@ -16,15 +16,27 @@ displayName="Faithful Fangs"
 displayURL="https://github.com/davibogo/wolf_mod"
 #logoFile="faithful_fangs.png" #optional
 #credits="" #optional
-authors="davibogo"
+authors="Davi Bogo"
 #displayTest="MATCH_VERSION" #optional, default=MATCH_VERSION when not clientSideOnly, else IGNORE_ALL_VERSION
 
-description='''Smarter, more loyal wolves: they follow their owner better, can respawn, wear armor and return home.'''
+description='''Faithful Fangs turns your tamed wolf into a real companion, with a name, a home and a bond that lasts.
+
+- Dog Tag and Dog Bed: engrave your wolf's name on a Dog Tag and give it a Dog Bed in any of 16 colors. Its name floats above the bed, and in Stay Home mode it sleeps there at night, curled up with its eyes closed.
+- Wolf Panel (Shift + right click your wolf): health, bed location, an armor slot and quick buttons for its mode (Follow, Stay Home, Sit) and stance (Passive, Neutral, Aggressive).
+- A safer companion: it follows you without jumping off cliffs or walking into fire or lava, keeps away from creepers, gets unstuck on its own and follows you to other dimensions.
+- Respawn: a bonded wolf that dies comes back to its bed right away, hurt but alive.
+- Scent: while you explore, your wolf digs up finds that depend on the biome, dimension and structure, and now and then a special bone: Ancient, Blazing or Ethereal.
+- Upgrades: spend special bones to raise its Health, Strength, Agility and Scent.
+- Armor: copper, iron, golden, diamond and netherite wolf armor that takes every hit like the armadillo one, each tier lasting longer. Golden armor keeps piglins calm around you.
+
+Credits
+Many of the ideas in this mod came from Érica Scherner Ferreira.
+Developed with the help of Claude Opus 5.5, by Anthropic.'''
 
 [[dependencies.faithful_fangs]] #recommended
     modId="forge"
     mandatory=true
-    versionRange="[66,)"
+    versionRange="[66.0.13,)"
     ordering="NONE"
     side="BOTH"
 
