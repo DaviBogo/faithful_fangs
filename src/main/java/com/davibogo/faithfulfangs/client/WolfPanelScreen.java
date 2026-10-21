@@ -29,11 +29,11 @@ import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Wolf Panel screen. Left part: wolf preview, health in hearts, bed location, and the mode and
- * stance buttons. Right column: the upgrades (Health, Strength, Agility, Scent), each with its
- * level (one square per level, colored by the bone it took) and a button showing the bones the
- * next level costs, plus how many special bones the player carries. Room is left below for the
- * armor slot (phase 5).
+ * Wolf Panel screen. Left part: the armor slot beside the wolf preview (like the horse screen),
+ * health in hearts, bed location, and the mode and stance buttons. Right column: the upgrades
+ * (Health, Strength, Agility, Scent), each with its level (one square per level, colored by the
+ * bone it took) and a button showing the bones the next level costs, plus how many special bones
+ * the player carries. Bottom: the player's inventory.
  */
 public class WolfPanelScreen extends AbstractContainerScreen<WolfPanelMenu> {
     private static final Identifier BACKGROUND =
@@ -45,14 +45,17 @@ public class WolfPanelScreen extends AbstractContainerScreen<WolfPanelMenu> {
     private static final Identifier HEART_HALF = Identifier.withDefaultNamespace("hud/heart/half");
 
     private static final int WIDTH = 346;
-    private static final int HEIGHT = 150;
+    private static final int HEIGHT = 246;
     /** Width of the left part (status, mode, stance). */
     private static final int LEFT_WIDTH = 206;
     /** Vanilla container label color. */
     private static final int LABEL_COLOR = 0xFF404040;
     private static final int SLEEPING_COLOR = 0xFF3F5FA0;
     private static final int MAX_COLOR = 0xFFFFAA00;
-    private static final int RIGHT_COLUMN_X = 68;
+    private static final int RIGHT_COLUMN_X = 88;
+    /** Inside of the wolf preview box. */
+    private static final int PREVIEW_X0 = 28;
+    private static final int PREVIEW_X1 = 80;
     private static final int MODE_LABEL_Y = 78;
     private static final int MODE_BUTTONS_Y = 88;
     private static final int STANCE_LABEL_Y = 114;
@@ -69,10 +72,11 @@ public class WolfPanelScreen extends AbstractContainerScreen<WolfPanelMenu> {
     private static final int UPGRADE_BUTTON_X = UPGRADES_X + 103;
     private static final int UPGRADE_BUTTON_WIDTH = 24;
     private static final int BONES_Y = 122;
-    /** Sprites in the panel texture. */
-    private static final int ICONS_V = 160;
+    /** Sprites in the panel texture, right of the panel. */
+    private static final int SPRITES_U = 352;
+    private static final int ICONS_V = 0;
     private static final int ICON_SIZE = 9;
-    private static final int PIPS_V = 172;
+    private static final int PIPS_V = 12;
     private static final int PIP_SIZE = 6;
 
     private final Map<WolfMode, Button> modeButtons = new EnumMap<>(WolfMode.class);
@@ -213,7 +217,7 @@ public class WolfPanelScreen extends AbstractContainerScreen<WolfPanelMenu> {
         LivingEntity wolf = this.findWolf();
         if (wolf != null) {
             InventoryScreen.extractEntityInInventoryFollowsMouse(graphics,
-                    this.leftPos + 8, this.topPos + 18, this.leftPos + 60, this.topPos + 70,
+                    this.leftPos + PREVIEW_X0, this.topPos + 18, this.leftPos + PREVIEW_X1, this.topPos + 70,
                     30, 0.0625F, this.xMouse, this.yMouse, wolf);
         }
     }
@@ -232,6 +236,7 @@ public class WolfPanelScreen extends AbstractContainerScreen<WolfPanelMenu> {
         graphics.text(this.font, Component.translatable("screen.faithful_fangs.wolf_panel.stance"),
                 8, STANCE_LABEL_Y, LABEL_COLOR, false);
         this.extractUpgrades(graphics);
+        graphics.text(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, LABEL_COLOR, false);
     }
 
     /** One heart per 2 health points, 10 per row, like the player's health bar. Returns the rows used. */
@@ -276,14 +281,14 @@ public class WolfPanelScreen extends AbstractContainerScreen<WolfPanelMenu> {
                 graphics.blitSprite(RenderPipelines.GUI_TEXTURED, HEART_FULL, UPGRADES_X, y + 5, ICON_SIZE, ICON_SIZE);
             } else {
                 graphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, UPGRADES_X, y + 5,
-                        (upgrade.ordinal() - 1) * ICON_SIZE, ICONS_V, ICON_SIZE, ICON_SIZE, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+                        SPRITES_U + (upgrade.ordinal() - 1) * ICON_SIZE, ICONS_V, ICON_SIZE, ICON_SIZE, TEXTURE_WIDTH, TEXTURE_HEIGHT);
             }
             graphics.text(this.font, Component.translatable(upgrade.translationKey()), UPGRADE_NAME_X, y + 6, LABEL_COLOR, false);
 
             int level = this.menu.getUpgradeLevel(upgrade);
             for (int i = 0; i < WolfUpgrade.MAX_LEVEL; i++) {
                 // Empty square, or the color of the bone that level took.
-                int u = i < level ? pipSprite(i + 1) * PIP_SIZE : 0;
+                int u = SPRITES_U + (i < level ? pipSprite(i + 1) * PIP_SIZE : 0);
                 graphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND, UPGRADE_PIPS_X + i * 7, y + 7,
                         u, PIPS_V, PIP_SIZE, PIP_SIZE, TEXTURE_WIDTH, TEXTURE_HEIGHT);
             }

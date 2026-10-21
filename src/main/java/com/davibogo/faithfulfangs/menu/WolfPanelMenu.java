@@ -1,5 +1,6 @@
 package com.davibogo.faithfulfangs.menu;
 
+import com.davibogo.faithfulfangs.FaithfulFangs;
 import com.davibogo.faithfulfangs.bond.Bond;
 import com.davibogo.faithfulfangs.bond.BondRegistry;
 import com.davibogo.faithfulfangs.registry.ModMenuTypes;
@@ -17,20 +18,25 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ArmorSlot;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Wolf Panel (Shift + right click on your wolf). A container menu so that later phases can add
- * the armor slot and the player inventory. Health, mode, stance, "has bed" and the upgrade levels
- * are synced live through data slots; the buttons go through vanilla's container button packet.
+ * Wolf Panel (Shift + right click on your wolf). Slots: the wolf's armor (body slot, like the
+ * horse screen; not for puppies, which cannot wear armor) and the player's inventory. Health, mode,
+ * stance, "has bed" and the upgrade levels are synced live through data slots; the buttons go
+ * through vanilla's container button packet.
  */
 public class WolfPanelMenu extends AbstractContainerMenu {
     /** Button ids: mode buttons are MODE_BUTTONS + WolfMode ordinal, stance buttons STANCE_BUTTONS + WolfStance ordinal. */
@@ -51,6 +57,20 @@ public class WolfPanelMenu extends AbstractContainerMenu {
 
     private static final double MAX_DISTANCE_SQR = 8.0 * 8.0;
 
+    /** Slot layout: the armor slot, then the player's inventory (27 slots) and hotbar (9). */
+    public static final int ARMOR_SLOT = 0;
+    private static final int INVENTORY_START = 1;
+    private static final int HOTBAR_START = INVENTORY_START + 27;
+    private static final int INVENTORY_END = HOTBAR_START + 9;
+    /** Slot positions in the screen (item corner, 1 pixel inside the slot frame). */
+    public static final int ARMOR_SLOT_X = 8;
+    public static final int ARMOR_SLOT_Y = 18;
+    public static final int INVENTORY_X = 8;
+    public static final int INVENTORY_Y = 164;
+    /** Wolf armor silhouette shown in the empty armor slot. */
+    private static final Identifier EMPTY_ARMOR_SLOT =
+            Identifier.fromNamespaceAndPath(FaithfulFangs.MODID, "container/slot/wolf_armor");
+
     /** Bed position shown in the panel, taken when it opens. */
     public record BedInfo(Identifier dimension, BlockPos pos) {
     }
@@ -66,6 +86,7 @@ public class WolfPanelMenu extends AbstractContainerMenu {
         super(ModMenuTypes.WOLF_PANEL.get(), containerId);
         this.wolf = wolf;
         this.player = player;
+        this.addSlots(player.getInventory(), wolf);
         this.wolfEntityId = wolf.getId();
         this.bed = bond == null ? null : new BedInfo(bond.bed().dimension().identifier(), bond.bed().pos());
         MinecraftServer server = ((ServerLevel) wolf.level()).getServer();
@@ -104,8 +125,37 @@ public class WolfPanelMenu extends AbstractContainerMenu {
         this.player = null;
         this.wolfEntityId = extraData.readVarInt();
         this.bed = extraData.readBoolean() ? new BedInfo(extraData.readIdentifier(), extraData.readBlockPos()) : null;
+        this.addSlots(playerInventory,
+                playerInventory.player.level().getEntity(this.wolfEntityId) instanceof Wolf clientWolf ? clientWolf : null);
         this.data = new SimpleContainerData(DATA_COUNT);
         this.addDataSlots(this.data);
+    }
+
+    /** Same slots on both sides: the client builds its armor slot on its copy of the wolf. */
+    private void addSlots(Inventory playerInventory, @Nullable Wolf wolf) {
+        if (wolf != null) {
+            this.addSlot(new ArmorSlot(wolf.createEquipmentSlotContainer(EquipmentSlot.BODY), wolf, EquipmentSlot.BODY,
+                    0, ARMOR_SLOT_X, ARMOR_SLOT_Y, EMPTY_ARMOR_SLOT) {
+                @Override
+                public boolean isActive() {
+                    return !wolf.isBaby();
+                }
+
+                @Override
+                public boolean mayPlace(ItemStack stack) {
+                    return !wolf.isBaby() && super.mayPlace(stack);
+                }
+            });
+        } else {
+            // The wolf is not loaded on this client (should not happen): an inert slot keeps the layout.
+            this.addSlot(new Slot(new SimpleContainer(1), 0, ARMOR_SLOT_X, ARMOR_SLOT_Y) {
+                @Override
+                public boolean mayPlace(ItemStack stack) {
+                    return false;
+                }
+            });
+        }
+        this.addStandardInventorySlots(playerInventory, INVENTORY_X, INVENTORY_Y);
     }
 
     public static void open(ServerPlayer player, Wolf wolf) {
@@ -147,8 +197,8 @@ public class WolfPanelMenu extends AbstractContainerMenu {
     }
 
     /**
-     * The panel has no slots, so vanilla would not send inventory changes while it is open; send
-     * them, so the bone counts and upgrade buttons stay right after paying or picking up bones.
+     * The panel only shows the main inventory and hotbar; also send changes to the rest (offhand,
+     * worn armor), where bones may be taken from too, so the bone counts stay right.
      */
     @Override
     public void broadcastChanges() {
@@ -164,9 +214,42 @@ public class WolfPanelMenu extends AbstractContainerMenu {
                 || this.wolf.isAlive() && this.wolf.isOwnedBy(player) && player.distanceToSqr(this.wolf) <= MAX_DISTANCE_SQR;
     }
 
+    /** Shift + click: armor to the inventory; wolf armor from the inventory to the wolf; otherwise inventory <-> hotbar. */
     @Override
     public ItemStack quickMoveStack(Player player, int slotIndex) {
-        return ItemStack.EMPTY; // no slots yet (armor slot comes in phase 5)
+        Slot slot = this.slots.get(slotIndex);
+        if (!slot.hasItem()) {
+            return ItemStack.EMPTY;
+        }
+        ItemStack stack = slot.getItem();
+        ItemStack original = stack.copy();
+        Slot armorSlot = this.slots.get(ARMOR_SLOT);
+        if (slotIndex == ARMOR_SLOT) {
+            if (!this.moveItemStackTo(stack, INVENTORY_START, INVENTORY_END, true)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (armorSlot.isActive() && !armorSlot.hasItem() && armorSlot.mayPlace(stack)) {
+            if (!this.moveItemStackTo(stack, ARMOR_SLOT, ARMOR_SLOT + 1, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (slotIndex < HOTBAR_START) {
+            if (!this.moveItemStackTo(stack, HOTBAR_START, INVENTORY_END, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (!this.moveItemStackTo(stack, INVENTORY_START, HOTBAR_START, false)) {
+            return ItemStack.EMPTY;
+        }
+
+        if (stack.isEmpty()) {
+            slot.setByPlayer(ItemStack.EMPTY);
+        } else {
+            slot.setChanged();
+        }
+        if (stack.getCount() == original.getCount()) {
+            return ItemStack.EMPTY;
+        }
+        slot.onTake(player, stack);
+        return original;
     }
 
     // ------------------------------------------------------------ read by the screen (client)

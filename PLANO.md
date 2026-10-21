@@ -261,7 +261,11 @@ Desenho refeito em 21/10/2026 (veja o sistema 6): absorve como a armadura de tat
   - **Ouro:** com um lobo seu de armadura de ouro a até 16 blocos, piglins não começam a te atacar (como se você usasse ouro). Piglins irritados com você (por exemplo, porque você bateu num deles ou abriu um baú do bastião) ainda atacam; brutos continuam hostis. Piglins também adoram o item (pegam do chão), como qualquer item de ouro.
   - Texturas: as placas da armadura de tatu recoloridas com a cor de cada metal (as tiras de couro continuam iguais).
   - Sem encantamentos (nem a de tatu aceita).
-- [ ] **2. Espaço de armadura no Painel do lobo** (com o inventário do jogador embaixo) — esboço antes de implementar.
+- [x] **2. Espaço de armadura no Painel do lobo** (opção B do esboço, escolhida em 21/10/2026; `menu/WolfPanelMenu`, `client/WolfPanelScreen`):
+  - O painel cresceu para 346x246: o **inventário do jogador** fica embaixo, à esquerda, e o **espaço de armadura** fica no canto de cima, **ao lado do retrato do lobo**, como na tela do cavalo. O retrato, os corações e a cama andaram 20 pixels para a direita.
+  - Coloca e tira arrastando ou com **Shift + clique** (armadura do inventário vai para o lobo; a do lobo volta para o inventário; o resto troca entre inventário e barra rápida). Aceita a armadura de tatu e os tiers do mod. O espaço vazio mostra o contorno de uma armadura de lobo (`textures/gui/sprites/container/slot/wolf_armor.png`) e a barra de durabilidade aparece no ícone.
+  - **Filhotes** não usam armadura (regra vanilla), então o espaço some para eles.
+  - O clique direito vanilla com a armadura no lobo e a tesoura continuam funcionando.
 
 ### Estrutura do código
 - `FaithfulFangs` — classe principal; registra os `DeferredRegister` e a aba criativa.
