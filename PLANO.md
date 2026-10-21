@@ -273,6 +273,11 @@ Desenho refeito em 21/10/2026 (veja o sistema 6): absorve como a armadura de tat
   - Botão **"Upgrades..."** embaixo da coluna: troca Modo e Postura pelas melhorias (ícone e nome; embaixo, os quadradinhos de nível e o botão com o preço); **"Back"** volta. O painel sempre abre mostrando Modo e Postura.
   - O "You have:" saiu, porque a quantidade de ossos aparece no próprio inventário.
 
+### Descrição e versões (21/10/2026)
+- Descrição do mod no `mods.toml` (em inglês), resumindo os cinco sistemas, com os créditos: **muitas das ideias vieram de Érica Scherner Ferreira**, e o mod foi **desenvolvido com a ajuda do Claude Opus 5.5 (Anthropic)**. Autor: "Davi Bogo".
+- Versões conferidas: mod **1.0.0** (igual no `build.gradle` e no `mods.toml`; mudar nos dois juntos), Minecraft **26.3** (aceita `[26.3,26.4)`), Forge **26.3-66.0.13** (o `mods.toml` agora exige a partir de 66.0.13, a versão usada no desenvolvimento), Java **25**, ForgeGradle 7, EventBus 7.0.6.
+- `pack.mcmeta`: a descrição mostrava `${mod_id}` literal (o build não substitui variáveis); agora é "Faithful Fangs resources". O formato 121 é o mesmo que o próprio Forge 66 usa.
+
 ### Estrutura do código
 - `FaithfulFangs` — classe principal; registra os `DeferredRegister` e a aba criativa.
 - `registry/ModBlocks`, `registry/ModItems`, `registry/ModBlockEntities`, `registry/ModDataComponents` — registros.
