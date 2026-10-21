@@ -66,7 +66,7 @@ public class WolfPanelMenu extends AbstractContainerMenu {
     public static final int ARMOR_SLOT_X = 8;
     public static final int ARMOR_SLOT_Y = 18;
     public static final int INVENTORY_X = 8;
-    public static final int INVENTORY_Y = 164;
+    public static final int INVENTORY_Y = 84;
     /** Wolf armor silhouette shown in the empty armor slot. */
     private static final Identifier EMPTY_ARMOR_SLOT =
             Identifier.fromNamespaceAndPath(FaithfulFangs.MODID, "container/slot/wolf_armor");

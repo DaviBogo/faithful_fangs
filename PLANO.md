@@ -239,7 +239,7 @@ Etapas: (1) os três ossos especiais; (2) as listas de achados em JSON (data pac
 ### Fase 4 — Melhorias de atributos (concluída em 21/10/2026)
 Detalhes definidos em 21/10/2026: layout "coluna ao lado" no Painel do lobo (opção A do esboço, para sobrar espaço embaixo para a armadura e o inventário da fase 5); os corações novos de um nível de Health já vêm cheios.
 - [x] **1. Melhorias no Painel do lobo** (`wolf/WolfUpgrade`, `wolf/WolfUpgrades`, tela em `client/WolfPanelScreen`):
-  - O painel ficou mais largo (346x150). Na **coluna da direita** ("Upgrades"), uma linha por atributo: ícone, nome, **5 quadradinhos de nível** coloridos pelo osso que cada nível custou (bege = Ancient, laranja = Blazing, lilás = Ethereal) e um **botão com o osso e a quantidade** do próximo nível. O botão fica cinza se faltar osso e vira "MAX" no nível 5. Embaixo, "You have:" mostra quantos ossos especiais o jogador carrega.
+  - Para cada atributo: ícone, nome, **5 quadradinhos de nível** coloridos pelo osso que cada nível custou (bege = Ancient, laranja = Blazing, lilás = Ethereal) e um **botão com o osso e a quantidade** do próximo nível. O botão fica cinza se faltar osso e vira "MAX" no nível 5. Desde o painel compacto da fase 5, as melhorias abrem pelo botão "Upgrades..." (veja a fase 5, passo 3); o "You have:" com a contagem de ossos saiu, porque o inventário aparece no painel.
   - Dica do botão: "Upgrade Strength to level 2" / "+1 attack damage, total +2" / "Costs 2 Ancient Bones" (em vermelho "Needs ..., you have ..." quando falta osso).
   - Efeitos por nível: **Health** +2 corações (+4 de vida máxima), **Strength** +1 de dano, **Agility** +10% de velocidade (era +5%, pouco perceptível nos testes), **Scent** +15% (a exploração do dono conta 15% a mais para os achados, comuns e especiais).
   - Custo por nível (igual para todos): 1 Ancient, 2 Ancient, 1 Blazing, 2 Blazing, 1 Ethereal (o último nível custava 2 Ethereal; mudado para 1 em 21/10/2026). Os ossos saem de qualquer lugar do inventário (inclusive a mão secundária). No **criativo é de graça**, como a mesa de encantamento.
@@ -262,10 +262,16 @@ Desenho refeito em 21/10/2026 (veja o sistema 6): absorve como a armadura de tat
   - Texturas: as placas da armadura de tatu recoloridas com a cor de cada metal (as tiras de couro continuam iguais).
   - Sem encantamentos (nem a de tatu aceita).
 - [x] **2. Espaço de armadura no Painel do lobo** (opção B do esboço, escolhida em 21/10/2026; `menu/WolfPanelMenu`, `client/WolfPanelScreen`):
-  - O painel cresceu para 346x246: o **inventário do jogador** fica embaixo, à esquerda, e o **espaço de armadura** fica no canto de cima, **ao lado do retrato do lobo**, como na tela do cavalo. O retrato, os corações e a cama andaram 20 pixels para a direita.
+  - O **espaço de armadura** fica **ao lado do retrato do lobo**, como na tela do cavalo, e o **inventário do jogador** aparece no painel. (A primeira versão deixou o painel com 346x246 e espaço sobrando; foi reorganizada no passo 3.)
   - Coloca e tira arrastando ou com **Shift + clique** (armadura do inventário vai para o lobo; a do lobo volta para o inventário; o resto troca entre inventário e barra rápida). Aceita a armadura de tatu e os tiers do mod. O espaço vazio mostra o contorno de uma armadura de lobo (`textures/gui/sprites/container/slot/wolf_armor.png`) e a barra de durabilidade aparece no ícone.
   - **Filhotes** não usam armadura (regra vanilla), então o espaço some para eles.
   - O clique direito vanilla com a armadura no lobo e a tesoura continuam funcionando.
+- [x] **3. Painel compacto** (pedido em 21/10/2026: o painel ocupava tela demais e tinha espaço em branco; opção A do esboço):
+  - **262x170**, mais ou menos o tamanho da tela do cavalo.
+  - **Esquerda:** espaço de armadura, retrato, corações e cama em cima; o **inventário logo abaixo**, perto do espaço de armadura.
+  - **Direita:** **Modo** e **Postura** em destaque, como colunas de botões grandes (um por linha), para usar rápido. O atual fica com o texto amarelo.
+  - Botão **"Upgrades..."** embaixo da coluna: troca Modo e Postura pelas melhorias (ícone e nome; embaixo, os quadradinhos de nível e o botão com o preço); **"Back"** volta. O painel sempre abre mostrando Modo e Postura.
+  - O "You have:" saiu, porque a quantidade de ossos aparece no próprio inventário.
 
 ### Estrutura do código
 - `FaithfulFangs` — classe principal; registra os `DeferredRegister` e a aba criativa.
