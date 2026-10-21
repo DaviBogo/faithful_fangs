@@ -2,6 +2,7 @@ package com.davibogo.faithfulfangs;
 
 import com.davibogo.faithfulfangs.client.ClientSetup;
 import com.davibogo.faithfulfangs.event.ModEvents;
+import com.davibogo.faithfulfangs.item.WolfArmorTier;
 import com.davibogo.faithfulfangs.network.ModNetwork;
 import com.davibogo.faithfulfangs.registry.ModBlockEntities;
 import com.davibogo.faithfulfangs.registry.ModBlocks;
@@ -65,6 +66,14 @@ public final class FaithfulFangs {
         if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             // Dog Tag right after the vanilla Name Tag.
             event.getEntries().putAfter(new ItemStack(Items.NAME_TAG), new ItemStack(ModItems.DOG_TAG.get()), visibility);
+        } else if (event.getTabKey() == CreativeModeTabs.COMBAT) {
+            // Wolf armor tiers right after the vanilla Wolf Armor.
+            ItemStack previous = new ItemStack(Items.WOLF_ARMOR);
+            for (WolfArmorTier tier : WolfArmorTier.values()) {
+                ItemStack stack = new ItemStack(tier.item());
+                event.getEntries().putAfter(previous, stack, visibility);
+                previous = stack;
+            }
         } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             // Special bones right after the vanilla Bone.
             ItemStack previous = new ItemStack(Items.BONE);

@@ -3,6 +3,7 @@ package com.davibogo.faithfulfangs.registry;
 import com.davibogo.faithfulfangs.FaithfulFangs;
 import com.davibogo.faithfulfangs.item.DogTagItem;
 import com.davibogo.faithfulfangs.item.SpecialBoneItem;
+import com.davibogo.faithfulfangs.item.WolfArmorTier;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
@@ -28,6 +29,9 @@ public final class ModItems {
     public static final RegistryObject<Item> BLAZING_BONE = registerBone("blazing_bone", Rarity.RARE, true);
     public static final RegistryObject<Item> ETHEREAL_BONE = registerBone("ethereal_bone", Rarity.EPIC, false);
 
+    /** Wolf armor tiers made from the vanilla Wolf Armor at the smithing table. */
+    public static final Map<WolfArmorTier, RegistryObject<Item>> WOLF_ARMORS = registerWolfArmors();
+
     /** Block items for the Dog Beds; they stack to 1 like vanilla beds. */
     public static final Map<DyeColor, RegistryObject<BlockItem>> DOG_BEDS = registerDogBeds();
 
@@ -36,6 +40,18 @@ public final class ModItems {
             Item.Properties properties = new Item.Properties().setId(ITEMS.key(name)).rarity(rarity);
             return new SpecialBoneItem(fireResistant ? properties.fireResistant() : properties);
         });
+    }
+
+    private static Map<WolfArmorTier, RegistryObject<Item>> registerWolfArmors() {
+        Map<WolfArmorTier, RegistryObject<Item>> armors = new EnumMap<>(WolfArmorTier.class);
+        for (WolfArmorTier tier : WolfArmorTier.values()) {
+            String name = tier.itemName();
+            armors.put(tier, ITEMS.register(name, () -> {
+                Item.Properties properties = new Item.Properties().setId(ITEMS.key(name)).wolfArmor(tier.material());
+                return new Item(tier.fireResistant() ? properties.fireResistant() : properties);
+            }));
+        }
+        return Collections.unmodifiableMap(armors);
     }
 
     private static Map<DyeColor, RegistryObject<BlockItem>> registerDogBeds() {

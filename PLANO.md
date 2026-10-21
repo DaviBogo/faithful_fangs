@@ -110,22 +110,27 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 - **Não dá para desfazer.**
 - As melhorias **são mantidas** no respawn e quando a cama é quebrada.
 
-### 6. Armadura — ✅ DEFINIDO
-- Colocada pelo **espaço de armadura do Painel do lobo**. O clique direito vanilla continua funcionando.
-- **Tiers**, do mais fraco ao mais forte:
+### 6. Armadura — ✅ DEFINIDO (refeito em 21/10/2026)
+O desenho original (armadura que reduz o dano como a do jogador, receitas na mesa de trabalho e todos os encantamentos de armadura) foi trocado depois de analisar a armadura de tatu do vanilla.
+- **Funciona como a armadura de tatu do vanilla:** enquanto existe, **absorve 100% de cada golpe**; cada ponto de dano vira 1 ponto de desgaste, e o golpe que a quebra também é absorvido inteiro. Não protege do que a de tatu também não protege: afogamento, sufocar dentro de bloco, congelamento, fome, magia (poção de dano), efeito wither, espinhos, aperto de mobs, borda do mundo, vazio e `/kill`. Fogo, lava, queda, explosão e ataques ela absorve.
+- Mostra rachaduras em 3 estágios com som, tem som próprio ao quebrar e sai com tesoura (só o dono).
+- **Obtenção:** só na **mesa de ferraria, sem molde**: armadura de tatu no espaço do meio + **1 lingote ou diamante** no da direita. Todo tier sai **direto da de tatu**, inclusive o netherite. O desgaste, a cor tingida e o nome passam para a armadura nova.
+- **Tiers** (absorção em pontos de dano; um zumbi tira uns 3):
 
-| Tier | Obtenção | Observação |
-|---|---|---|
-| Escamas de tatu | Vanilla | Base |
-| Cobre | Receita com lingotes de cobre | Melhor que tatu, pior que ferro |
-| Ferro | Receita com lingotes de ferro | |
-| Ouro | Receita com lingotes de ouro | Fraca, mas **piglins ignoram o lobo** |
-| Diamante | Receita com diamantes | Alta |
-| Netherite | Diamante + lingote de netherite na mesa de ferraria | A melhor. O **item** não queima no fogo ou na lava (como todo item de netherite), mas **não protege o lobo** do fogo |
+| Tier | Material na ferraria | Absorve | Observação |
+|---|---|---|---|
+| Tatu | — (vanilla, 6 escamas) | 64 | Base |
+| Cobre | 1 lingote de cobre | 96 | |
+| Ouro | 1 lingote de ouro | 112 | **Protege o dono dos piglins**: com o lobo de armadura de ouro a até 16 blocos, os piglins tratam o dono como se ele usasse ouro. Brutos continuam hostis e piglins irritados continuam atacando, igual ao vanilla. (Piglins nunca atacam lobos por conta própria, só revidam.) |
+| Ferro | 1 lingote de ferro | 128 | |
+| Diamante | 1 diamante | 256 | |
+| Netherite | 1 lingote de netherite | 384 | O **item** não queima no fogo nem na lava |
 
-- **Encantamentos:** aceita **todos** os encantamentos de armadura do jogador (capacete, peitoral, calças e botas). Cada um funciona no lobo como funcionaria no jogador, por exemplo Queda de Pena reduz dano de queda e Passos Profundos acelera na água.
-- **Durabilidade:** gasta quando o lobo é atingido, como a armadura do jogador. Tiers melhores duram mais.
-- **Morte:** funciona **igual ao jogador**. Não há perda extra de durabilidade ao morrer; a armadura só se desgasta pelos golpes recebidos, inclusive o golpe fatal. Ela continua no lobo após o respawn.
+- **Conserto:** clique direito no lobo sentado com o material do tier (escama de tatu, lingote de cobre, de ferro, de ouro, diamante ou lingote de netherite) conserta 12,5%, igual à escama no vanilla. Também na bigorna.
+- **Tingimento:** a listra tingível da armadura de tatu continua em todos os tiers.
+- **Encantamentos: nenhum.** A armadura de tatu do vanilla não aceita encantamento (nem na mesa nem com livro na bigorna), então os outros tiers também não.
+- Colocada pelo **espaço de armadura do Painel do lobo**; o clique direito vanilla continua funcionando.
+- **Morte:** a armadura continua no lobo após o respawn.
 
 ## Ordem de implementação proposta
 1. Cama + plaquinha + nome + modos (base de tudo).
@@ -245,6 +250,19 @@ Detalhes definidos em 21/10/2026: layout "coluna ao lado" no Painel do lobo (op�
   - Os ossos ganharam a dica "Shift + right click your wolf to upgrade it".
   - **Comandos de teste:** `/faithfulfangs debug` olhando para o lobo mostra os níveis, a vida máxima, o dano e a velocidade; `/faithfulfangs debug reset_upgrades` zera as melhorias do lobo que você está olhando.
 
+### Fase 5 — Armadura (em andamento)
+Desenho refeito em 21/10/2026 (veja o sistema 6): absorve como a armadura de tatu, feita na mesa de ferraria com 1 lingote ou diamante, sem encantamentos; o ouro protege o dono dos piglins.
+- [x] **1. Tiers de armadura** (`item/WolfArmorTier`, `wolf/WolfArmor`, registrados em `registry/ModItems`):
+  - Itens **Copper, Iron, Golden, Diamond e Netherite Wolf Armor**, na aba criativa Combate logo depois da armadura de tatu. A de netherite não queima no fogo nem na lava.
+  - **Mesa de ferraria, sem molde:** armadura de tatu + lingote de cobre, de ferro, de ouro, diamante ou lingote de netherite (`data/faithful_fangs/recipe/*_wolf_armor_smithing.json`). Desgaste, cor e nome passam para a nova.
+  - **Absorção** igual à de tatu (o jogo só faz isso para o item dele, então o mod repete a regra em `WolfArmor`): absorvem 96 (cobre), 112 (ouro), 128 (ferro), 256 (diamante) e 384 (netherite); rachaduras em 3 estágios com som e pedacinhos do material; som próprio ao quebrar; mesmas exceções (afogamento, fome, magia, wither, espinhos, vazio...).
+  - **Conserto:** com o lobo sentado, clique direito com o material do tier conserta 12,5% (regra vanilla, que já vale para qualquer armadura de lobo); bigorna também.
+  - **Tingimento:** mesma listra tingível da de tatu, com receita de tingir na mesa de trabalho e lavagem no caldeirão.
+  - **Ouro:** com um lobo seu de armadura de ouro a até 16 blocos, piglins não começam a te atacar (como se você usasse ouro). Piglins irritados com você (por exemplo, porque você bateu num deles ou abriu um baú do bastião) ainda atacam; brutos continuam hostis. Piglins também adoram o item (pegam do chão), como qualquer item de ouro.
+  - Texturas: as placas da armadura de tatu recoloridas com a cor de cada metal (as tiras de couro continuam iguais).
+  - Sem encantamentos (nem a de tatu aceita).
+- [ ] **2. Espaço de armadura no Painel do lobo** (com o inventário do jogador embaixo) — esboço antes de implementar.
+
 ### Estrutura do código
 - `FaithfulFangs` — classe principal; registra os `DeferredRegister` e a aba criativa.
 - `registry/ModBlocks`, `registry/ModItems`, `registry/ModBlockEntities`, `registry/ModDataComponents` — registros.
@@ -269,4 +287,5 @@ Detalhes definidos em 21/10/2026: layout "coluna ao lado" no Painel do lobo (op�
 - `wolf/WolfScent`, `wolf/ai/ScentGoal`, `wolf/ai/ScentAlertGoal` — faro: contagem por distância, achado aos pés do lobo e o chamado com latidos. Listas em `data/faithful_fangs/loot_table/scent/`.
 - `wolf/WolfSounds` — latido e choro do próprio lobo.
 - `wolf/WolfUpgrade`, `wolf/WolfUpgrades` — melhorias de atributos: níveis, custos, modificadores e a compra pelo painel.
+- `item/WolfArmorTier`, `wolf/WolfArmor` — tiers de armadura (material, absorção do dano, efeito do ouro nos piglins). Texturas em `textures/entity/equipment/wolf_body/` e `equipment/`.
 - `command/FaithfulFangsCommand` — `/faithfulfangs debug` (inclui `bind`, `unbind`, `find` e `reset_upgrades`).

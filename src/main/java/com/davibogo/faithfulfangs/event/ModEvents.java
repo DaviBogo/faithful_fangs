@@ -7,6 +7,7 @@ import com.davibogo.faithfulfangs.item.EngravedTag;
 import com.davibogo.faithfulfangs.menu.WolfPanelMenu;
 import com.davibogo.faithfulfangs.registry.ModItems;
 import com.davibogo.faithfulfangs.wolf.FollowAcrossDimensions;
+import com.davibogo.faithfulfangs.wolf.WolfArmor;
 import com.davibogo.faithfulfangs.wolf.WolfHome;
 import com.davibogo.faithfulfangs.wolf.WolfRecovery;
 import com.davibogo.faithfulfangs.wolf.WolfScent;
@@ -26,7 +27,9 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
+import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.listener.ObjBooleanBiConsumer;
@@ -56,6 +59,10 @@ public final class ModEvents {
 
         // Scent: monsters killed by a wolf make its next special bone come sooner.
         LivingDeathEvent.BUS.addListener((ObjBooleanBiConsumer<LivingDeathEvent>) WolfScent::onLivingDeath);
+
+        // Armor tiers: absorb hits like the vanilla Wolf Armor; golden armor calms piglins.
+        LivingHurtEvent.BUS.addListener((Predicate<LivingHurtEvent>) WolfArmor::onLivingHurt);
+        LivingChangeTargetEvent.BUS.addListener((Predicate<LivingChangeTargetEvent>) WolfArmor::onChangeTarget);
     }
 
     /**

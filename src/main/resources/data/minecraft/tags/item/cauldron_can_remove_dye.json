@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "faithful_fangs:copper_wolf_armor",
+    "faithful_fangs:iron_wolf_armor",
+    "faithful_fangs:golden_wolf_armor",
+    "faithful_fangs:diamond_wolf_armor",
+    "faithful_fangs:netherite_wolf_armor"
+  ]
+}

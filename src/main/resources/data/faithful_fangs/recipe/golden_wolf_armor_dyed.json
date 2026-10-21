@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_dye",
+  "dye": "#minecraft:dyes",
+  "group": "dyed_armor",
+  "result": {
+    "id": "faithful_fangs:golden_wolf_armor"
+  },
+  "target": "faithful_fangs:golden_wolf_armor"
+}

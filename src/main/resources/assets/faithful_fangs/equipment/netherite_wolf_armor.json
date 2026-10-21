@@ -1,0 +1,13 @@
+{
+  "layers": {
+    "wolf_body": [
+      {
+        "texture": "faithful_fangs:netherite_wolf_armor"
+      },
+      {
+        "dyeable": {},
+        "texture": "minecraft:armadillo_scute_overlay"
+      }
+    ]
+  }
+}
