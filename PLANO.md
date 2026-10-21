@@ -204,7 +204,7 @@ Detalhes definidos em 20/10/2026: volta **imediatamente** depois da morte (os 5 
   - Vanilla já não regenera vida de lobo sozinho (só comendo), então "não regenera sozinho" já vale.
   - **Comando de teste:** `/faithfulfangs debug` lista os lobos que ainda esperam a área da cama carregar (normalmente nenhum).
 
-### Fase 3 — Faro (em andamento)
+### Fase 3 — Faro (concluída em 20/10/2026)
 Etapas: (1) os três ossos especiais; (2) as listas de achados em JSON (data pack); (3) o faro em si (o lobo encontrar, entregar e latir).
 - [x] **1. Ossos especiais** (`item/SpecialBoneItem`, registrados em `registry/ModItems`):
   - **Ancient Bone** (Overworld, raridade incomum, nome amarelo), **Blazing Bone** (Nether, rara, nome azul-claro, não queima no fogo nem na lava, como o netherite) e **Ethereal Bone** (End, épica, nome roxo).
