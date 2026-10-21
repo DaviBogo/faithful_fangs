@@ -221,6 +221,15 @@ Etapas: (1) os três ossos especiais; (2) as listas de achados em JSON (data pac
   - Os biomas são reconhecidos por tags (`#minecraft:is_forest`, `#c:is_snowy`...), então biomas de outros mods que usam essas tags caem na lista certa.
   - Exemplos de chance por achado: diamante 1,6% no subterrâneo profundo; ender pearl 1,3% na lista geral do Overworld; blaze rod 13% na fortaleza; chave do desafio 3,2% nas câmaras do desafio; esmeralda 4,1% na vila.
   - **Teste:** `/loot give @s loot faithful_fangs:scent/common` sorteia um achado para o lugar onde você está (`.../rare` sorteia o osso especial; também dá para sortear uma lista direto, como `faithful_fangs:scent/overworld/desert`).
+  - Observação: o `/loot give` põe o item direto no inventário; no faro o item cai no chão, onde o lobo está (passo 3).
+- [x] **3. O faro em si** (`wolf/WolfScent`, `wolf/ai/ScentGoal`, `wolf/ai/ScentAlertGoal`, `wolf/WolfSounds`; definido em 20/10/2026):
+  - **Quem fareja:** só lobo domesticado **com vínculo** (cama e Dog Tag), em **Follow**, de pé, com o dono vivo, jogando (não espectador) e a até **24 blocos**, na mesma dimensão. Com vários lobos, **cada um faz os próprios achados**.
+  - **Pago em distância:** a cada 5 s mede quanto o dono avançou em linha reta, sem contar a altura. Menos de 2 blocos (construindo, parado, AFK, andando em círculo pequeno) não conta; mais de 30 blocos (6 blocos/s, uma corrida) conta como 30, então cavalo, elytra ou teleporte não dão achados a mais.
+  - **Contagem regressiva por lobo**, salva no próprio lobo (continua depois de sair do jogo e no respawn): achado comum a cada **900 blocos** em média e osso especial a cada **7200 blocos** em média (cerca de 5 e 40 minutos andando a 3 blocos/s); cada achado vem entre 50% e 150% da média.
+  - **Bônus de combate:** cada monstro que o lobo mata faz a contagem do próximo osso especial andar **25% mais rápido** (até 3 vezes mais rápido). O bônus some 10 minutos depois da última morte ou quando o osso especial é encontrado.
+  - **Achado:** quando a contagem chega a zero e o lobo está calmo (no chão, fora da água e da lava, sem fogo, sem alvo e fora de perigo), ele para, cava (voa um pouco de terra do bloco em que ele está) e o item **cai no chão aos pés dele**. O osso especial tem prioridade e solta brilhos verdes. Se o lobo não pode cavar agora, o achado espera até ele poder.
+  - **Chamado:** o lobo late na hora (o latido do próprio lobo, mais alto que o normal) e fica junto do item, com a cabeça inclinada, olhando para o dono e latindo a cada 1,5 a 2,5 s. Para quando o dono chega a 3 blocos do lobo ou do item, quando alguém pega o item, depois de **20 segundos**, se o dono se afasta mais de 48 blocos ou se acontece algo mais importante (briga, perigo, ordem de sentar ou de ficar em casa). Depois volta a seguir o dono normalmente (teleportando se ele estiver longe).
+  - **Comandos de teste:** `/faithfulfangs debug` olhando para o lobo mostra quantos blocos faltam para o próximo achado e para o osso especial, o bônus de combate e se ele está farejando agora. `/faithfulfangs debug find` (ou `find rare`) deixa um achado (ou o osso especial) pronto para o lobo que você está olhando ou para todos os seus lobos por perto; ele cava em até 5 s.
 
 ### Estrutura do código
 - `FaithfulFangs` — classe principal; registra os `DeferredRegister` e a aba criativa.
@@ -243,4 +252,6 @@ Etapas: (1) os três ossos especiais; (2) as listas de achados em JSON (data pac
 - `wolf/WolfSafety`, `wolf/ai/SafeFollowOwnerGoal`, `wolf/ai/LedgeGuardGoal`, `wolf/ai/StepGuardGoal`, `wolf/ai/HazardTargetGoal`, `wolf/ai/FireEscapeGoal` — segurança: seguir e teleportar com segurança, destravar, não pular de abismos, pulo de ataque seguro, fogo, lava e creepers.
 - `wolf/WolfSleep`, `client/wolf/*` — estado de sono, o renderizador e os modelos do lobo deitado (adulto e filhote) e as texturas de olhos fechados.
 - `wolf/WolfRecovery`, `bond/Recovery` — respawn: lobo vinculado que morre se recupera e volta para a cama.
-- `command/FaithfulFangsCommand` — `/faithfulfangs debug`.
+- `wolf/WolfScent`, `wolf/ai/ScentGoal`, `wolf/ai/ScentAlertGoal` — faro: contagem por distância, achado aos pés do lobo e o chamado com latidos. Listas em `data/faithful_fangs/loot_table/scent/`.
+- `wolf/WolfSounds` — latido e choro do próprio lobo.
+- `command/FaithfulFangsCommand` — `/faithfulfangs debug` (inclui `bind`, `unbind` e `find`).

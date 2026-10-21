@@ -7,9 +7,11 @@ import com.davibogo.faithfulfangs.bond.BondRegistry;
 import com.davibogo.faithfulfangs.bond.Recovery;
 import com.davibogo.faithfulfangs.item.EngravedTag;
 import com.davibogo.faithfulfangs.wolf.WolfData;
+import com.davibogo.faithfulfangs.wolf.WolfScent;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.List;
 import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -37,6 +39,8 @@ import org.jspecify.annotations.Nullable;
  *   <li>{@code /faithfulfangs debug} — list all bonds and describe the wolf or Dog Bed you are looking at</li>
  *   <li>{@code /faithfulfangs debug bind <name>} — bind the wolf you are looking at to the nearest free Dog Bed</li>
  *   <li>{@code /faithfulfangs debug unbind} — remove the bond of the wolf or Dog Bed you are looking at</li>
+ *   <li>{@code /faithfulfangs debug find [rare]} — make a scent find (or a special bone) due for the
+ *       wolf you are looking at, or for all your wolves nearby</li>
  * </ul>
  */
 public final class FaithfulFangsCommand {
@@ -56,7 +60,11 @@ public final class FaithfulFangsCommand {
                                         .executes(context -> bind(context.getSource(),
                                                 StringArgumentType.getString(context, "name")))))
                         .then(Commands.literal("unbind")
-                                .executes(context -> unbind(context.getSource())))));
+                                .executes(context -> unbind(context.getSource())))
+                        .then(Commands.literal("find")
+                                .executes(context -> find(context.getSource(), false))
+                                .then(Commands.literal("rare")
+                                        .executes(context -> find(context.getSource(), true))))));
     }
 
     private static int info(CommandSourceStack source) throws CommandSyntaxException {
@@ -91,6 +99,12 @@ public final class FaithfulFangsCommand {
             send(source, Component.literal(" bond: " + (bond == null ? "none" : bond.wolfName() + " at " + describe(bond.bed()))));
             send(source, Component.literal(" name on wolf: " + (wolf.getCustomName() == null ? "none" : wolf.getCustomName().getString())
                     + ", name applied by bond: " + nullToNone(WolfData.getBondName(wolf))));
+            if (wolf.isTame()) {
+                send(source, Component.literal(" scent: next find in " + Math.round(WolfScent.distanceLeft(wolf, false))
+                        + " blocks, special bone in " + Math.round(WolfScent.distanceLeft(wolf, true))
+                        + " blocks, kill bonus +" + Math.round(WolfScent.killBonus(wolf) * 100) + "%, sniffing now: "
+                        + (WolfScent.sniffingOwner(wolf) != null ? "yes" : "no")));
+            }
             return 1;
         }
 
@@ -164,6 +178,34 @@ public final class FaithfulFangsCommand {
         send(source, Component.literal("Removed the bond of " + removed.wolfName() + " (bed at "
                 + describe(removed.bed()) + ").").withStyle(ChatFormatting.YELLOW));
         return 1;
+    }
+
+    /**
+     * Makes a find (or a special bone) due for the wolf you are looking at, or for all your wolves
+     * nearby; each digs it up within 5 seconds if it can sniff and dig.
+     */
+    private static int find(CommandSourceStack source, boolean rare) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        Wolf lookedAt = lookedAtWolf(player);
+        List<Wolf> wolves = lookedAt != null
+                ? List.of(lookedAt)
+                : source.getLevel().getEntitiesOfClass(Wolf.class, player.getBoundingBox().inflate(WolfScent.OWNER_RANGE),
+                        wolf -> wolf.isTame() && wolf.isOwnedBy(player));
+        int count = 0;
+        for (Wolf wolf : wolves) {
+            if (wolf.isTame() && wolf.isOwnedBy(player)) {
+                WolfScent.makeDue(wolf, rare);
+                count++;
+            }
+        }
+        if (count == 0) {
+            return fail(source, "Look at one of your wolves, or stand near them.");
+        }
+        send(source, Component.literal((rare ? "A special bone" : "A find") + " is due for " + count
+                + " wolf(s). Bonded wolves in Follow mode dig it up within 5 seconds, once they are calm,"
+                + " on the ground and within " + (int) WolfScent.OWNER_RANGE + " blocks of you.")
+                .withStyle(ChatFormatting.GREEN));
+        return count;
     }
 
     private static @Nullable Wolf lookedAtWolf(ServerPlayer player) {

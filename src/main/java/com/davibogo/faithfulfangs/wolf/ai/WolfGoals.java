@@ -32,11 +32,14 @@ import net.minecraft.world.entity.monster.warden.Warden;
  * (Neutral keeps the vanilla goals as they are), modes (Follow uses a safer "follow owner", Stay
  * Home adds the home goals and turns off the vanilla goals that pull the wolf to its owner) and
  * safety (no cliff jumping, no unsafe leaps, no stepping into fire or lava, no fighting mobs in
- * fire). Every wolf, wild or tamed, keeps away from creepers and gets out of fire calmly.
+ * fire) and scent (bonded wolves dig up finds while the owner explores). Every wolf, wild or
+ * tamed, keeps away from creepers and gets out of fire calmly.
  */
 public final class WolfGoals {
     /** Target priority of the Aggressive goal: after the vanilla "defend owner" and "revenge" goals. */
     private static final int AGGRESSIVE_TARGET_PRIORITY = 5;
+    /** Same as the vanilla melee attack and before "follow owner" (6), so the alert can interrupt following. */
+    private static final int SCENT_ALERT_PRIORITY = 5;
 
     private WolfGoals() {
     }
@@ -65,6 +68,11 @@ public final class WolfGoals {
         wolf.goalSelector.addGoal(6, new SleepInBedGoal(wolf));
         // Only acts while the wolf is outside its home area (Stay Home): walks back in.
         wolf.goalSelector.addGoal(7, new MoveTowardsRestrictionGoal(wolf, 1.0));
+
+        // Scent: finds while exploring. The alert (stay by the find and bark) comes before following the owner.
+        ScentAlertGoal scentAlert = new ScentAlertGoal(wolf);
+        wolf.goalSelector.addGoal(SCENT_ALERT_PRIORITY, scentAlert);
+        wolf.goalSelector.addGoal(SCENT_ALERT_PRIORITY, new ScentGoal(wolf, scentAlert));
 
         // Safety.
         wolf.goalSelector.addGoal(1, new ModeGatedGoal(

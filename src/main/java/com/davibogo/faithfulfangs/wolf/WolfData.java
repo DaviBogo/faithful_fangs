@@ -1,5 +1,6 @@
 package com.davibogo.faithfulfangs.wolf;
 
+import java.util.Optional;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 import org.jspecify.annotations.Nullable;
@@ -15,6 +16,10 @@ public final class WolfData {
     private static final String STANCE = "stance";
     private static final String RETURNING = "returning";
     private static final String HOME_APPLIED = "home_applied";
+    private static final String SCENT_COMMON = "scent_common";
+    private static final String SCENT_RARE = "scent_rare";
+    private static final String SCENT_KILL_BONUS = "scent_kill_bonus";
+    private static final String SCENT_LAST_KILL = "scent_last_kill";
 
     private WolfData() {
     }
@@ -84,6 +89,42 @@ public final class WolfData {
 
     public static void setHomeApplied(Wolf wolf, boolean applied) {
         setFlag(wolf, HOME_APPLIED, applied);
+    }
+
+    /**
+     * Scent: how far (in blocks) the owner still has to explore with the wolf before its next
+     * common find ({@code rare} false) or special bone ({@code rare} true). Empty until first rolled.
+     */
+    public static Optional<Float> getScentDistance(Wolf wolf, boolean rare) {
+        return read(wolf).getFloat(rare ? SCENT_RARE : SCENT_COMMON);
+    }
+
+    public static void setScentDistance(Wolf wolf, boolean rare, float distance) {
+        CompoundTag root = read(wolf);
+        root.putFloat(rare ? SCENT_RARE : SCENT_COMMON, distance);
+        write(wolf, root);
+    }
+
+    /** Scent: bonus from monsters the wolf killed (0.25 = the next special bone comes 25% sooner). */
+    public static float getKillBonus(Wolf wolf) {
+        return read(wolf).getFloatOr(SCENT_KILL_BONUS, 0.0F);
+    }
+
+    /** Game time of the wolf's last monster kill that counted for the bonus. */
+    public static long getLastKillTime(Wolf wolf) {
+        return read(wolf).getLongOr(SCENT_LAST_KILL, 0L);
+    }
+
+    public static void setKillBonus(Wolf wolf, float bonus, long lastKillTime) {
+        CompoundTag root = read(wolf);
+        if (bonus <= 0.0F) {
+            root.remove(SCENT_KILL_BONUS);
+            root.remove(SCENT_LAST_KILL);
+        } else {
+            root.putFloat(SCENT_KILL_BONUS, bonus);
+            root.putLong(SCENT_LAST_KILL, lastKillTime);
+        }
+        write(wolf, root);
     }
 
     private static void setFlag(Wolf wolf, String key, boolean value) {

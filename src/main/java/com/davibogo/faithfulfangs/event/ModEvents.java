@@ -9,6 +9,7 @@ import com.davibogo.faithfulfangs.registry.ModItems;
 import com.davibogo.faithfulfangs.wolf.FollowAcrossDimensions;
 import com.davibogo.faithfulfangs.wolf.WolfHome;
 import com.davibogo.faithfulfangs.wolf.WolfRecovery;
+import com.davibogo.faithfulfangs.wolf.WolfScent;
 import com.davibogo.faithfulfangs.wolf.ai.WolfGoals;
 import java.util.function.Predicate;
 import net.minecraft.core.component.DataComponents;
@@ -27,6 +28,7 @@ import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.listener.ObjBooleanBiConsumer;
 
 /** Listeners on the Forge (game) event buses. Some run on both logical sides. */
 public final class ModEvents {
@@ -50,6 +52,9 @@ public final class ModEvents {
         // Respawn: bonded wolves recover and come back to their bed.
         LivingDeathEvent.BUS.addListener((Predicate<LivingDeathEvent>) WolfRecovery::onDeath);
         TickEvent.ServerTickEvent.Post.BUS.addListener(WolfRecovery::onServerTick);
+
+        // Scent: monsters killed by a wolf make its next special bone come sooner.
+        LivingDeathEvent.BUS.addListener((ObjBooleanBiConsumer<LivingDeathEvent>) WolfScent::onLivingDeath);
     }
 
     /**

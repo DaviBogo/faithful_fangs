@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -20,14 +18,11 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.wolf.Wolf;
-import net.minecraft.world.entity.animal.wolf.WolfSoundVariant;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueInput;
@@ -69,7 +64,7 @@ public final class WolfRecovery {
             return false;
         }
 
-        playWhine(level, wolf, wolf.position());
+        WolfSounds.whine(level, wolf, wolf.position());
         level.broadcastEntityEvent(wolf, net.minecraft.world.entity.EntityEvent.POOF);
 
         prepareForRest(wolf);
@@ -165,7 +160,7 @@ public final class WolfRecovery {
         registry.removeRecovery(recovery.wolfId());
 
         level.sendParticles(ParticleTypes.POOF, spot.x, spot.y + 0.4, spot.z, 12, 0.3, 0.3, 0.3, 0.02);
-        playWhine(level, wolf, spot);
+        WolfSounds.whine(level, wolf, spot);
         String name = bond != null ? bond.wolfName() : recovery.wolfName();
         tellOwner(server, recovery.ownerId(), Component.translatable(onBed
                 ? "message.faithful_fangs.wolf_back_home" : "message.faithful_fangs.wolf_back_no_bed", name));
@@ -186,16 +181,6 @@ public final class WolfRecovery {
     }
 
     // ------------------------------------------------------------ helpers
-
-    private static void playWhine(ServerLevel level, Wolf wolf, Vec3 pos) {
-        Holder<WolfSoundVariant> variant = wolf.get(DataComponents.WOLF_SOUND_VARIANT);
-        if (variant == null) {
-            return;
-        }
-        WolfSoundVariant.WolfSoundSet sounds = wolf.isBaby() ? variant.value().babySounds() : variant.value().adultSounds();
-        Holder<SoundEvent> whine = sounds.whineSound();
-        level.playSound(null, pos.x, pos.y, pos.z, whine, SoundSource.NEUTRAL, 1.0F, 1.0F);
-    }
 
     private static void tellOwner(MinecraftServer server, UUID ownerId, Component message) {
         ServerPlayer owner = server.getPlayerList().getPlayer(ownerId);
