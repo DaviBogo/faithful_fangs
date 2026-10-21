@@ -1,7 +1,6 @@
 package com.davibogo.faithfulfangs.wolf;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -22,8 +21,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Safety rules for wolves: no walking into fire or lava, no jumping down cliffs, no leaping into
- * lava or over edges, no fighting mobs that stand in fire, and no teleporting next to a creeper.
+ * Safety rules for wolves: no walking into fire or lava, no jumping down cliffs, no fighting mobs
+ * that stand in fire, and no teleporting next to a creeper.
  * "Hazard" below means fire, lava, magma blocks and lit campfires.
  */
 public final class WolfSafety {
@@ -31,8 +30,6 @@ public final class WolfSafety {
     public static final float CREEPER_DISTANCE = 8.0F;
     /** How many path steps ahead are checked for a dangerous fall. */
     private static final int LOOK_AHEAD_NODES = 3;
-    /** Leaps cover about 3 blocks; the ground is checked at these distances. */
-    private static final int LEAP_LENGTH = 3;
 
     private WolfSafety() {
     }
@@ -158,44 +155,6 @@ public final class WolfSafety {
             Node next = path.getNode(i + 1);
             if (node.y - next.y > safeDrop && next.type != PathType.WATER) {
                 return true;
-            }
-        }
-        return false;
-    }
-
-    /** True if leaping at the target lands on safe ground: no drop, no lava, fire or powder snow. */
-    public static boolean isSafeLeap(Mob mob, LivingEntity target) {
-        if (target.getY() < mob.getY() - 1.5) {
-            return false;
-        }
-        Vec3 direction = new Vec3(target.getX() - mob.getX(), 0.0, target.getZ() - mob.getZ());
-        if (direction.lengthSqr() < 1.0E-7) {
-            return true;
-        }
-        direction = direction.normalize();
-        for (int step = 1; step <= LEAP_LENGTH; step++) {
-            BlockPos feet = BlockPos.containing(mob.getX() + direction.x * step, mob.getY() + 0.1,
-                    mob.getZ() + direction.z * step);
-            if (!hasSafeGround(mob, feet)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static boolean hasSafeGround(Mob mob, BlockPos feet) {
-        BlockPos.MutableBlockPos pos = feet.mutable();
-        int safeDrop = safeDrop(mob);
-        for (int down = 0; down <= safeDrop; down++) {
-            PathType type = WalkNodeEvaluator.getPathTypeStatic(mob, pos);
-            switch (type) {
-                case OPEN -> pos.move(Direction.DOWN);
-                case LAVA, FIRE, FIRE_IN_NEIGHBOR, DAMAGING, POWDER_SNOW, ON_TOP_OF_POWDER_SNOW -> {
-                    return false;
-                }
-                default -> {
-                    return true; // ground, water, or a wall the leap will stop against
-                }
             }
         }
         return false;

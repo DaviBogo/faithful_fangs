@@ -30,10 +30,10 @@ import net.minecraft.world.entity.monster.warden.Warden;
 /**
  * Adds the Faithful Fangs AI goals to every wolf. Most only act on tamed wolves: stances
  * (Neutral keeps the vanilla goals as they are), modes (Follow uses a safer "follow owner", Stay
- * Home adds the home goals and turns off the vanilla goals that pull the wolf to its owner) and
- * safety (no cliff jumping, no unsafe leaps, no stepping into fire or lava, no fighting mobs in
- * fire) and scent (bonded wolves dig up finds while the owner explores). Every wolf, wild or
- * tamed, keeps away from creepers and gets out of fire calmly.
+ * Home adds the home goals and turns off the vanilla goals that pull the wolf to its owner),
+ * safety (no cliff jumping, no stepping into fire or lava, no fighting mobs in fire) and scent
+ * (bonded wolves dig up finds while the owner explores). Tamed wolves do not leap at their
+ * target. Every wolf, wild or tamed, keeps away from creepers and gets out of fire calmly.
  */
 public final class WolfGoals {
     /** Target priority of the Aggressive goal: after the vanilla "defend owner" and "revenge" goals. */
@@ -95,7 +95,7 @@ public final class WolfGoals {
      *   <li>"sit when ordered", which also makes tamed wolves sit whenever the owner is offline or in
      *       another dimension — in Stay Home only when really ordered to sit.</li>
      * </ul>
-     * The vanilla leap at the target is kept, but a tamed wolf only leaps onto safe ground.
+     * The vanilla leap at the target is kept for wild wolves only.
      */
     private static void gateVanillaGoals(Wolf wolf) {
         BooleanSupplier following = () -> WolfData.getStandingMode(wolf) == WolfMode.FOLLOW;
@@ -106,8 +106,9 @@ public final class WolfGoals {
             if (goal instanceof FollowOwnerGoal) {
                 replace(wolf, priority, goal, new ModeGatedGoal(new SafeFollowOwnerGoal(wolf), following));
             } else if (goal instanceof LeapAtTargetGoal) {
-                replace(wolf, priority, goal, new ModeGatedGoal(goal, () -> !wolf.isTame()
-                        || wolf.getTarget() == null || WolfSafety.isSafeLeap(wolf, wolf.getTarget())));
+                // Tamed wolves run and bite instead: a leap has a fixed speed, so a wolf that keeps
+                // leaping after its prey would not get faster with the Agility upgrade.
+                replace(wolf, priority, goal, new ModeGatedGoal(goal, () -> !wolf.isTame()));
             } else if (goal instanceof TamableAnimal.TamableAnimalPanicGoal) {
                 replace(wolf, priority, goal, new FireEscapeGoal(wolf));
             } else if (goal instanceof SitWhenOrderedToGoal) {

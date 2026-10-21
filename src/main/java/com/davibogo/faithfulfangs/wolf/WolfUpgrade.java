@@ -94,7 +94,7 @@ public enum WolfUpgrade {
             case 2 -> new Cost(ModItems.ANCIENT_BONE, 2);
             case 3 -> new Cost(ModItems.BLAZING_BONE, 1);
             case 4 -> new Cost(ModItems.BLAZING_BONE, 2);
-            default -> new Cost(ModItems.ETHEREAL_BONE, 2);
+            default -> new Cost(ModItems.ETHEREAL_BONE, 1);
         };
     }
 

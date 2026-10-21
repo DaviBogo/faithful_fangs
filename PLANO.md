@@ -105,7 +105,7 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
   - Nv 2: 2 Ossos Ancestrais
   - Nv 3: 1 Osso Ígneo
   - Nv 4: 2 Ossos Ígneos
-  - Nv 5: 2 Ossos Etéreos
+  - Nv 5: 1 Osso Etéreo (eram 2; mudado em 21/10/2026)
 - **Sem limite total:** o lobo pode maximizar todos os atributos.
 - **Não dá para desfazer.**
 - As melhorias **são mantidas** no respawn e quando a cama é quebrada.
@@ -187,7 +187,7 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
   - **Seguir mais seguro** (`wolf/ai/SafeFollowOwnerGoal`, substitui o "seguir o dono" vanilla no Follow): mesmas distâncias do vanilla (começa a seguir a 10 blocos, para a 2, teleporta a partir de 12). O teleporte só vai para lugares seguros: os mesmos testes do vanilla (chão firme, sem fogo ou lava do lado, sem folhas, espaço livre) e nunca a menos de 8 blocos de um creeper. Se não achar lugar seguro, continua andando até o dono.
   - **Trava menos:** com o dono a mais de 5 blocos, o lobo que quase não se mexeu por 3 s (cerca, escada, beirada de água) ou que está sem caminho/nadando e não chegou mais perto em 5 s teleporta até o dono, sem esperar os 12 blocos do vanilla.
   - **Não pula de abismos** (`wolf/ai/LedgeGuardGoal`): no vanilla, um lobo brigando aceita quedas de 20+ blocos para alcançar o alvo. Agora, se os próximos passos do caminho têm uma queda que machuca (mais de 3 blocos, salvo se cair na água), ele para na beirada; se o mesmo alvo continuar fora de alcance por 5 s, desiste dele. O Aggressive também ignora monstros mais de 3 blocos abaixo dele.
-  - **Pulo no alvo seguro:** o lobo domesticado só dá o pulo de ataque vanilla se o alvo não estiver mais baixo e o chão até ele for seguro (sem buraco, lava, fogo ou neve fofa).
+  - **Sem pulo de ataque** (mudado em 21/10/2026, na fase 4): o lobo domesticado não dá mais o pulo de ataque vanilla; ele corre até o alvo e morde. O pulo tem velocidade fixa, então um lobo pulando atrás da presa não ficava mais rápido com a melhoria Agility. Antes, ele só pulava se o chão até o alvo fosse seguro. O lobo selvagem continua pulando como no vanilla.
   - **Fogo e lava:** nunca anda por fogo, blocos de magma ou fogueiras acesas, e evita passar colado em fogo ou lava quando há outro caminho. Última defesa (`wolf/ai/StepGuardGoal`, a cada tick): se os próximos passos do lobo (pelo caminho ou pelo embalo, inclusive pulo ou empurrão) terminam em fogo ou lava, ou acima de lava/fogo onde ele cairia, ele para na hora. O teleporte também recusa lugares com fogo ou lava a 1 bloco (o teste vanilla falha quando há água do lado).
   - **Mob no fogo depende da postura** (`wolf/ai/HazardTargetGoal`, definido em 20/10/2026): no **Neutral**, o lobo larga o alvo que está pegando fogo ou em cima/ao lado de fogo ou lava, e fica 3 s sem escolher alvo (não defende o dono de um zumbi queimando no sol). No **Aggressive**, ele aceita o risco de se queimar: ataca esses mobs (inclusive escolhe sozinho), morde da beirada sem nunca pisar em fogo ou lava e, se pegar fogo no meio da briga, continua brigando (só foge se estiver dentro do fogo ou colado nele). Em qualquer postura, se o lobo não chega mais perto do alvo por 5 s (por exemplo, alvo dentro da lava), desiste dele e fica 3 s sem escolher alvo.
   - **Sai do fogo com calma** (`wolf/ai/FireEscapeGoal`, todos os lobos, substitui o pânico vanilla que corria para lugares aleatórios, às vezes de volta para o fogo): no Follow, com o dono a 12+ blocos, teleporta até ele (lugar seguro); pegando fogo e com água a até 8 blocos, vai para a água; se está no perigo ou colado nele (fogo, lava, magma, neve fofa, cacto), anda até o lugar mais perto a pelo menos 2 blocos de fogo ou lava e fica lá até o fogo apagar.
@@ -237,10 +237,11 @@ Detalhes definidos em 21/10/2026: layout "coluna ao lado" no Painel do lobo (op�
   - O painel ficou mais largo (346x150). Na **coluna da direita** ("Upgrades"), uma linha por atributo: ícone, nome, **5 quadradinhos de nível** coloridos pelo osso que cada nível custou (bege = Ancient, laranja = Blazing, lilás = Ethereal) e um **botão com o osso e a quantidade** do próximo nível. O botão fica cinza se faltar osso e vira "MAX" no nível 5. Embaixo, "You have:" mostra quantos ossos especiais o jogador carrega.
   - Dica do botão: "Upgrade Strength to level 2" / "+1 attack damage, total +2" / "Costs 2 Ancient Bones" (em vermelho "Needs ..., you have ..." quando falta osso).
   - Efeitos por nível: **Health** +2 corações (+4 de vida máxima), **Strength** +1 de dano, **Agility** +5% de velocidade, **Scent** +15% (a exploração do dono conta 15% a mais para os achados, comuns e especiais).
-  - Custo por nível (igual para todos): 1 Ancient, 2 Ancient, 1 Blazing, 2 Blazing, 2 Ethereal. Os ossos saem de qualquer lugar do inventário (inclusive a mão secundária). No **criativo é de graça**, como a mesa de encantamento.
+  - Custo por nível (igual para todos): 1 Ancient, 2 Ancient, 1 Blazing, 2 Blazing, 1 Ethereal (o último nível custava 2 Ethereal; mudado para 1 em 21/10/2026). Os ossos saem de qualquer lugar do inventário (inclusive a mão secundária). No **criativo é de graça**, como a mesa de encantamento.
   - Ao comprar: som de subir de nível e brilhos verdes no lobo; num nível de Health os corações novos já vêm cheios.
   - Vale para qualquer lobo seu (com ou sem cama). Não dá para desfazer. Os níveis ficam salvos no lobo, então continuam no respawn e quando a cama é quebrada; os modificadores de atributo também são salvos com o lobo (a vida extra está lá assim que ele carrega).
   - Com Health alto, os corações ocupam até 3 linhas e a cama desce um pouco no painel.
+  - Para a Agility valer também na caça, o lobo domesticado não dá mais o pulo de ataque (veja a seção de segurança da fase 1).
   - Os ossos ganharam a dica "Shift + right click your wolf to upgrade it".
   - **Comandos de teste:** `/faithfulfangs debug` olhando para o lobo mostra os níveis, a vida máxima, o dano e a velocidade; `/faithfulfangs debug reset_upgrades` zera as melhorias do lobo que você está olhando.
 
@@ -262,7 +263,7 @@ Detalhes definidos em 21/10/2026: layout "coluna ao lado" no Painel do lobo (op�
 - `wolf/ai/PassiveNoTargetGoal`, `wolf/ai/PassiveFleeGoal` — IA das posturas.
 - `wolf/WolfHome`, `wolf/ai/HomeStateGoal`, `wolf/ai/ReturnHomeGoal`, `wolf/ai/SleepInBedGoal` — Stay Home (área de casa, retorno com teleporte, dormir).
 - `wolf/FollowAcrossDimensions` — lobos em Follow acompanham o dono entre dimensões.
-- `wolf/WolfSafety`, `wolf/ai/SafeFollowOwnerGoal`, `wolf/ai/LedgeGuardGoal`, `wolf/ai/StepGuardGoal`, `wolf/ai/HazardTargetGoal`, `wolf/ai/FireEscapeGoal` — segurança: seguir e teleportar com segurança, destravar, não pular de abismos, pulo de ataque seguro, fogo, lava e creepers.
+- `wolf/WolfSafety`, `wolf/ai/SafeFollowOwnerGoal`, `wolf/ai/LedgeGuardGoal`, `wolf/ai/StepGuardGoal`, `wolf/ai/HazardTargetGoal`, `wolf/ai/FireEscapeGoal` — segurança: seguir e teleportar com segurança, destravar, não pular de abismos, fogo, lava e creepers.
 - `wolf/WolfSleep`, `client/wolf/*` — estado de sono, o renderizador e os modelos do lobo deitado (adulto e filhote) e as texturas de olhos fechados.
 - `wolf/WolfRecovery`, `bond/Recovery` — respawn: lobo vinculado que morre se recupera e volta para a cama.
 - `wolf/WolfScent`, `wolf/ai/ScentGoal`, `wolf/ai/ScentAlertGoal` — faro: contagem por distância, achado aos pés do lobo e o chamado com latidos. Listas em `data/faithful_fangs/loot_table/scent/`.
