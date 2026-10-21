@@ -39,6 +39,8 @@
   "message.faithful_fangs.tag_use_on_bed": "This tag is for %s. Use it on a Dog Bed.",
   "message.faithful_fangs.wolf_back_home": "%s was badly hurt and is back in its bed.",
   "message.faithful_fangs.wolf_back_no_bed": "%s was badly hurt and is back where its bed used to be.",
+  "message.faithful_fangs.wolf_found_something": "%s found something!",
+  "message.faithful_fangs.wolf_found_special": "%s found something special!",
   "message.faithful_fangs.wolf_renamed": "Your wolf is now called %s.",
   "screen.faithful_fangs.dog_tag.engrave": "Engrave",
   "screen.faithful_fangs.dog_tag.engrave_title": "Engrave Dog Tag",

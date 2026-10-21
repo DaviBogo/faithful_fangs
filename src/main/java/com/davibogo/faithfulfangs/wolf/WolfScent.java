@@ -7,6 +7,7 @@ import java.util.List;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -148,8 +149,9 @@ public final class WolfScent {
     }
 
     /**
-     * If a find is due (the special bone first) and the wolf can dig, drops it at the wolf's feet
-     * and starts the next countdown. Returns the dropped items (empty if nothing was found).
+     * If a find is due (the special bone first) and the wolf can dig, drops it at the wolf's feet,
+     * tells the owner ("Rex found something!") and starts the next countdown. Returns the dropped
+     * items (empty if nothing was found).
      */
     public static List<ItemEntity> tryFind(Wolf wolf) {
         boolean rare = distanceLeft(wolf, true) <= 0.0F;
@@ -160,6 +162,12 @@ public final class WolfScent {
         WolfData.setScentDistance(wolf, rare, rollDistance(wolf.getRandom(), rare));
         if (rare) {
             WolfData.setKillBonus(wolf, 0.0F, 0L);
+        }
+        if (!drops.isEmpty() && wolf.getOwner() instanceof ServerPlayer owner) {
+            // Above the owner's hotbar, so a find is not missed even if the barks are.
+            owner.sendOverlayMessage(Component.translatable(rare
+                    ? "message.faithful_fangs.wolf_found_special" : "message.faithful_fangs.wolf_found_something",
+                    wolf.getName()));
         }
         return drops;
     }
