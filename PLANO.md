@@ -250,7 +250,7 @@ Detalhes definidos em 21/10/2026: layout "coluna ao lado" no Painel do lobo (op�
   - Os ossos ganharam a dica "Shift + right click your wolf to upgrade it".
   - **Comandos de teste:** `/faithfulfangs debug` olhando para o lobo mostra os níveis, a vida máxima, o dano e a velocidade; `/faithfulfangs debug reset_upgrades` zera as melhorias do lobo que você está olhando.
 
-### Fase 5 — Armadura (em andamento)
+### Fase 5 — Armadura (concluída em 21/10/2026)
 Desenho refeito em 21/10/2026 (veja o sistema 6): absorve como a armadura de tatu, sem encantamentos; o ouro protege o dono dos piglins.
 - [x] **1. Tiers de armadura** (`item/WolfArmorTier`, `wolf/WolfArmor`, registrados em `registry/ModItems`):
   - Itens **Copper, Iron, Golden, Diamond e Netherite Wolf Armor**, na aba criativa Combate logo depois da armadura de tatu. A de netherite não queima no fogo nem na lava.
