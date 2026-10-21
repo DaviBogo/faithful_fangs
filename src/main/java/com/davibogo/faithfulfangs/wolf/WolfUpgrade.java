@@ -23,8 +23,8 @@ public enum WolfUpgrade {
     HEALTH("health", Attributes.MAX_HEALTH, 4.0, AttributeModifier.Operation.ADD_VALUE, 0.5),
     /** +1 attack damage per level. */
     STRENGTH("strength", Attributes.ATTACK_DAMAGE, 1.0, AttributeModifier.Operation.ADD_VALUE, 1.0),
-    /** +5% speed per level. */
-    AGILITY("agility", Attributes.MOVEMENT_SPEED, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, 100.0),
+    /** +10% speed per level. */
+    AGILITY("agility", Attributes.MOVEMENT_SPEED, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE, 100.0),
     /** +15% scent per level: the owner's exploring counts that much more towards finds. */
     SCENT("scent", null, 0.15, null, 100.0);
 

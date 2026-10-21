@@ -97,7 +97,7 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 |---|---|---|
 | Vida | Vida máxima | +2 corações |
 | Força | Dano do ataque | +1 de dano |
-| Agilidade | Velocidade | +5% |
+| Agilidade | Velocidade | +10% (era +5%; mudado em 21/10/2026) |
 | Faro | Chance de achados (sistema 4) | +15% |
 
 - **Custo por nível:**
@@ -231,12 +231,12 @@ Etapas: (1) os três ossos especiais; (2) as listas de achados em JSON (data pac
   - **Chamado** (ajustado em 20/10/2026, o latido único não chamava atenção): o lobo fica junto do item, com a cabeça inclinada e olhando para o dono, e chama com **sequências de 2 ou 3 latidos rápidos** (o latido do próprio lobo) a cada 2 a 2,5 s, bem diferente do latido solto que ele dá à toa. A primeira sequência (3 latidos) sempre toca inteira. O dono também recebe uma **mensagem acima da barra de itens**: "Rex found something!" ou, no osso especial, "Rex found something special!". O chamado para quando o dono chega a 3 blocos do lobo ou do item, quando alguém pega o item, depois de **20 segundos**, se o dono se afasta mais de 48 blocos ou se acontece algo mais importante (briga, perigo, ordem de sentar ou de ficar em casa). Depois o lobo volta a seguir o dono normalmente (teleportando se ele estiver longe).
   - **Comandos de teste:** `/faithfulfangs debug` olhando para o lobo mostra quantos blocos faltam para o próximo achado e para o osso especial, o bônus de combate e se ele está farejando agora. `/faithfulfangs debug find` (ou `find rare`) deixa um achado (ou o osso especial) pronto para o lobo que você está olhando ou para todos os seus lobos por perto; ele cava em até 5 s.
 
-### Fase 4 — Melhorias de atributos (em andamento)
+### Fase 4 — Melhorias de atributos (concluída em 21/10/2026)
 Detalhes definidos em 21/10/2026: layout "coluna ao lado" no Painel do lobo (opção A do esboço, para sobrar espaço embaixo para a armadura e o inventário da fase 5); os corações novos de um nível de Health já vêm cheios.
 - [x] **1. Melhorias no Painel do lobo** (`wolf/WolfUpgrade`, `wolf/WolfUpgrades`, tela em `client/WolfPanelScreen`):
   - O painel ficou mais largo (346x150). Na **coluna da direita** ("Upgrades"), uma linha por atributo: ícone, nome, **5 quadradinhos de nível** coloridos pelo osso que cada nível custou (bege = Ancient, laranja = Blazing, lilás = Ethereal) e um **botão com o osso e a quantidade** do próximo nível. O botão fica cinza se faltar osso e vira "MAX" no nível 5. Embaixo, "You have:" mostra quantos ossos especiais o jogador carrega.
   - Dica do botão: "Upgrade Strength to level 2" / "+1 attack damage, total +2" / "Costs 2 Ancient Bones" (em vermelho "Needs ..., you have ..." quando falta osso).
-  - Efeitos por nível: **Health** +2 corações (+4 de vida máxima), **Strength** +1 de dano, **Agility** +5% de velocidade, **Scent** +15% (a exploração do dono conta 15% a mais para os achados, comuns e especiais).
+  - Efeitos por nível: **Health** +2 corações (+4 de vida máxima), **Strength** +1 de dano, **Agility** +10% de velocidade (era +5%, pouco perceptível nos testes), **Scent** +15% (a exploração do dono conta 15% a mais para os achados, comuns e especiais).
   - Custo por nível (igual para todos): 1 Ancient, 2 Ancient, 1 Blazing, 2 Blazing, 1 Ethereal (o último nível custava 2 Ethereal; mudado para 1 em 21/10/2026). Os ossos saem de qualquer lugar do inventário (inclusive a mão secundária). No **criativo é de graça**, como a mesa de encantamento.
   - Ao comprar: som de subir de nível e brilhos verdes no lobo; num nível de Health os corações novos já vêm cheios.
   - Vale para qualquer lobo seu (com ou sem cama). Não dá para desfazer. Os níveis ficam salvos no lobo, então continuam no respawn e quando a cama é quebrada; os modificadores de atributo também são salvos com o lobo (a vida extra está lá assim que ele carrega).

@@ -67,7 +67,7 @@
   "screen.faithful_fangs.wolf_panel.upgrades": "Upgrades",
   "screen.faithful_fangs.wolf_panel.you_have": "You have:",
   "upgrade.faithful_fangs.agility": "Agility",
-  "upgrade.faithful_fangs.agility.gain": "+5%% speed, total +%s%%",
+  "upgrade.faithful_fangs.agility.gain": "+10%% speed, total +%s%%",
   "upgrade.faithful_fangs.health": "Health",
   "upgrade.faithful_fangs.health.gain": "+2 hearts, total +%s",
   "upgrade.faithful_fangs.scent": "Scent",
