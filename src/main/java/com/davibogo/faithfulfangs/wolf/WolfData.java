@@ -19,6 +19,7 @@ public final class WolfData {
     private static final String SCENT_COMMON = "scent_common";
     private static final String SCENT_RARE = "scent_rare";
     private static final String SCENT_KILL_BONUS = "scent_kill_bonus";
+    private static final String UPGRADES = "upgrades";
     private static final String SCENT_LAST_KILL = "scent_last_kill";
 
     private WolfData() {
@@ -123,6 +124,27 @@ public final class WolfData {
         } else {
             root.putFloat(SCENT_KILL_BONUS, bonus);
             root.putLong(SCENT_LAST_KILL, lastKillTime);
+        }
+        write(wolf, root);
+    }
+
+    /** Upgrade level (0 to 5) bought in the Wolf Panel. */
+    public static int getUpgradeLevel(Wolf wolf, WolfUpgrade upgrade) {
+        return read(wolf).getCompoundOrEmpty(UPGRADES).getIntOr(upgrade.id(), 0);
+    }
+
+    public static void setUpgradeLevel(Wolf wolf, WolfUpgrade upgrade, int level) {
+        CompoundTag root = read(wolf);
+        CompoundTag upgrades = root.getCompoundOrEmpty(UPGRADES);
+        if (level <= 0) {
+            upgrades.remove(upgrade.id());
+        } else {
+            upgrades.putInt(upgrade.id(), level);
+        }
+        if (upgrades.isEmpty()) {
+            root.remove(UPGRADES);
+        } else {
+            root.put(UPGRADES, upgrades);
         }
         write(wolf, root);
     }

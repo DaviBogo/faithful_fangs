@@ -8,6 +8,8 @@ import com.davibogo.faithfulfangs.bond.Recovery;
 import com.davibogo.faithfulfangs.item.EngravedTag;
 import com.davibogo.faithfulfangs.wolf.WolfData;
 import com.davibogo.faithfulfangs.wolf.WolfScent;
+import com.davibogo.faithfulfangs.wolf.WolfUpgrade;
+import com.davibogo.faithfulfangs.wolf.WolfUpgrades;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -23,6 +25,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.phys.AABB;
@@ -39,6 +42,7 @@ import org.jspecify.annotations.Nullable;
  *   <li>{@code /faithfulfangs debug} — list all bonds and describe the wolf or Dog Bed you are looking at</li>
  *   <li>{@code /faithfulfangs debug bind <name>} — bind the wolf you are looking at to the nearest free Dog Bed</li>
  *   <li>{@code /faithfulfangs debug unbind} — remove the bond of the wolf or Dog Bed you are looking at</li>
+ *   <li>{@code /faithfulfangs debug reset_upgrades} — clear the upgrades of the wolf you are looking at</li>
  *   <li>{@code /faithfulfangs debug find [rare]} — make a scent find (or a special bone) due for the
  *       wolf you are looking at, or for all your wolves nearby</li>
  * </ul>
@@ -61,6 +65,8 @@ public final class FaithfulFangsCommand {
                                                 StringArgumentType.getString(context, "name")))))
                         .then(Commands.literal("unbind")
                                 .executes(context -> unbind(context.getSource())))
+                        .then(Commands.literal("reset_upgrades")
+                                .executes(context -> resetUpgrades(context.getSource())))
                         .then(Commands.literal("find")
                                 .executes(context -> find(context.getSource(), false))
                                 .then(Commands.literal("rare")
@@ -104,6 +110,13 @@ public final class FaithfulFangsCommand {
                         + " blocks, special bone in " + Math.round(WolfScent.distanceLeft(wolf, true))
                         + " blocks, kill bonus +" + Math.round(WolfScent.killBonus(wolf) * 100) + "%, sniffing now: "
                         + (WolfScent.sniffingOwner(wolf) != null ? "yes" : "no")));
+                StringBuilder levels = new StringBuilder();
+                for (WolfUpgrade upgrade : WolfUpgrade.values()) {
+                    levels.append(levels.isEmpty() ? "" : ", ").append(upgrade.id()).append(' ').append(WolfUpgrades.level(wolf, upgrade));
+                }
+                send(source, Component.literal(" upgrades: " + levels + " (max health " + Math.round(wolf.getMaxHealth())
+                        + ", attack " + wolf.getAttributeValue(Attributes.ATTACK_DAMAGE)
+                        + ", speed " + String.format(java.util.Locale.ROOT, "%.3f", wolf.getAttributeValue(Attributes.MOVEMENT_SPEED)) + ")"));
             }
             return 1;
         }
@@ -177,6 +190,18 @@ public final class FaithfulFangsCommand {
         }
         send(source, Component.literal("Removed the bond of " + removed.wolfName() + " (bed at "
                 + describe(removed.bed()) + ").").withStyle(ChatFormatting.YELLOW));
+        return 1;
+    }
+
+    /** Clears the upgrades of the wolf you are looking at (they cannot be undone in the game). */
+    private static int resetUpgrades(CommandSourceStack source) throws CommandSyntaxException {
+        ServerPlayer player = source.getPlayerOrException();
+        Wolf wolf = lookedAtWolf(player);
+        if (wolf == null || !wolf.isTame() || !wolf.isOwnedBy(player)) {
+            return fail(source, "Look at one of your wolves (within " + (int) REACH + " blocks).");
+        }
+        WolfUpgrades.reset(wolf);
+        send(source, Component.literal("Upgrades cleared.").withStyle(ChatFormatting.YELLOW));
         return 1;
     }
 

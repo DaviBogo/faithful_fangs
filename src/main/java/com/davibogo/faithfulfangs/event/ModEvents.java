@@ -10,6 +10,7 @@ import com.davibogo.faithfulfangs.wolf.FollowAcrossDimensions;
 import com.davibogo.faithfulfangs.wolf.WolfHome;
 import com.davibogo.faithfulfangs.wolf.WolfRecovery;
 import com.davibogo.faithfulfangs.wolf.WolfScent;
+import com.davibogo.faithfulfangs.wolf.WolfUpgrades;
 import com.davibogo.faithfulfangs.wolf.ai.WolfGoals;
 import java.util.function.Predicate;
 import net.minecraft.core.component.DataComponents;
@@ -58,12 +59,13 @@ public final class ModEvents {
     }
 
     /**
-     * A wolf that loads (or changes dimension) gets the mod's AI goals and catches up with bond
-     * changes made while it was away.
+     * A wolf that loads (or changes dimension) gets the mod's AI goals and its upgrade modifiers,
+     * and catches up with bond changes made while it was away.
      */
     private static void onEntityJoinLevel(EntityJoinLevelEvent event) {
         if (event.getLevel() instanceof ServerLevel level && event.getEntity() instanceof Wolf wolf) {
             WolfGoals.install(wolf);
+            WolfUpgrades.applyModifiers(wolf);
             BondManager.syncWolf(level.getServer(), wolf);
             WolfHome.onJoin(wolf);
         }

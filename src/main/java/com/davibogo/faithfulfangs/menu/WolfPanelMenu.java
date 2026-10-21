@@ -8,6 +8,8 @@ import com.davibogo.faithfulfangs.wolf.WolfData;
 import com.davibogo.faithfulfangs.wolf.WolfMode;
 import com.davibogo.faithfulfangs.wolf.WolfSleep;
 import com.davibogo.faithfulfangs.wolf.WolfStance;
+import com.davibogo.faithfulfangs.wolf.WolfUpgrade;
+import com.davibogo.faithfulfangs.wolf.WolfUpgrades;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.Identifier;
@@ -27,13 +29,15 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Wolf Panel (Shift + right click on your wolf). A container menu so that later phases can add
- * the armor slot and the player inventory. Health, mode, stance and "has bed" are synced live
- * through data slots; the buttons go through vanilla's container button packet.
+ * the armor slot and the player inventory. Health, mode, stance, "has bed" and the upgrade levels
+ * are synced live through data slots; the buttons go through vanilla's container button packet.
  */
 public class WolfPanelMenu extends AbstractContainerMenu {
     /** Button ids: mode buttons are MODE_BUTTONS + WolfMode ordinal, stance buttons STANCE_BUTTONS + WolfStance ordinal. */
     public static final int MODE_BUTTONS = 0;
     public static final int STANCE_BUTTONS = 10;
+    /** Upgrade buttons: UPGRADE_BUTTONS + WolfUpgrade ordinal. */
+    public static final int UPGRADE_BUTTONS = 20;
 
     private static final int DATA_HEALTH = 0;
     private static final int DATA_MAX_HEALTH = 1;
@@ -41,7 +45,9 @@ public class WolfPanelMenu extends AbstractContainerMenu {
     private static final int DATA_STANCE = 3;
     private static final int DATA_HAS_BED = 4;
     private static final int DATA_SLEEPING = 5;
-    private static final int DATA_COUNT = 6;
+    /** Upgrade levels: DATA_UPGRADES + WolfUpgrade ordinal. */
+    private static final int DATA_UPGRADES = 6;
+    private static final int DATA_COUNT = DATA_UPGRADES + WolfUpgrade.values().length;
 
     private static final double MAX_DISTANCE_SQR = 8.0 * 8.0;
 
@@ -50,14 +56,16 @@ public class WolfPanelMenu extends AbstractContainerMenu {
     }
 
     private final @Nullable Wolf wolf; // server side only
+    private final @Nullable Player player; // server side only
     private final int wolfEntityId;
     private final @Nullable BedInfo bed;
     private final ContainerData data;
 
     /** Server side. */
-    private WolfPanelMenu(int containerId, Wolf wolf, @Nullable Bond bond) {
+    private WolfPanelMenu(int containerId, Player player, Wolf wolf, @Nullable Bond bond) {
         super(ModMenuTypes.WOLF_PANEL.get(), containerId);
         this.wolf = wolf;
+        this.player = player;
         this.wolfEntityId = wolf.getId();
         this.bed = bond == null ? null : new BedInfo(bond.bed().dimension().identifier(), bond.bed().pos());
         MinecraftServer server = ((ServerLevel) wolf.level()).getServer();
@@ -71,7 +79,9 @@ public class WolfPanelMenu extends AbstractContainerMenu {
                     case DATA_STANCE -> WolfData.getStance(wolf).ordinal();
                     case DATA_HAS_BED -> WolfCommands.hasBed(server, wolf) ? 1 : 0;
                     case DATA_SLEEPING -> WolfSleep.isSleeping(wolf) ? 1 : 0;
-                    default -> 0;
+                    default -> index >= DATA_UPGRADES && index < DATA_COUNT
+                            ? WolfUpgrades.level(wolf, WolfUpgrade.byOrdinal(index - DATA_UPGRADES))
+                            : 0;
                 };
             }
 
@@ -91,6 +101,7 @@ public class WolfPanelMenu extends AbstractContainerMenu {
     public WolfPanelMenu(int containerId, Inventory playerInventory, FriendlyByteBuf extraData) {
         super(ModMenuTypes.WOLF_PANEL.get(), containerId);
         this.wolf = null;
+        this.player = null;
         this.wolfEntityId = extraData.readVarInt();
         this.bed = extraData.readBoolean() ? new BedInfo(extraData.readIdentifier(), extraData.readBlockPos()) : null;
         this.data = new SimpleContainerData(DATA_COUNT);
@@ -100,7 +111,7 @@ public class WolfPanelMenu extends AbstractContainerMenu {
     public static void open(ServerPlayer player, Wolf wolf) {
         Bond bond = BondRegistry.get(player.level().getServer()).getByWolf(wolf.getUUID());
         player.openMenu(
-                new SimpleMenuProvider((containerId, inventory, p) -> new WolfPanelMenu(containerId, wolf, bond),
+                new SimpleMenuProvider((containerId, inventory, p) -> new WolfPanelMenu(containerId, p, wolf, bond),
                         wolf.getDisplayName()),
                 buf -> {
                     buf.writeVarInt(wolf.getId());
@@ -127,7 +138,24 @@ public class WolfPanelMenu extends AbstractContainerMenu {
             WolfCommands.setStance(this.wolf, WolfStance.byOrdinal(stanceIndex));
             return true;
         }
+        int upgradeIndex = buttonId - UPGRADE_BUTTONS;
+        if (upgradeIndex >= 0 && upgradeIndex < WolfUpgrade.values().length && player instanceof ServerPlayer serverPlayer) {
+            return WolfUpgrades.upgrade(serverPlayer, this.wolf, WolfUpgrade.byOrdinal(upgradeIndex))
+                    == WolfUpgrades.Result.UPGRADED;
+        }
         return false;
+    }
+
+    /**
+     * The panel has no slots, so vanilla would not send inventory changes while it is open; send
+     * them, so the bone counts and upgrade buttons stay right after paying or picking up bones.
+     */
+    @Override
+    public void broadcastChanges() {
+        super.broadcastChanges();
+        if (this.player != null) {
+            this.player.inventoryMenu.broadcastChanges();
+        }
     }
 
     @Override
@@ -170,6 +198,11 @@ public class WolfPanelMenu extends AbstractContainerMenu {
 
     public boolean hasBed() {
         return this.data.get(DATA_HAS_BED) != 0;
+    }
+
+    /** Upgrade level (0 to 5). */
+    public int getUpgradeLevel(WolfUpgrade upgrade) {
+        return this.data.get(DATA_UPGRADES + upgrade.ordinal());
     }
 
     /** Curled up asleep in its Dog Bed (Stay Home at night). */

@@ -85,12 +85,12 @@ public final class WolfScent {
 
     // ------------------------------------------------------------ countdown
 
-    /** Counts {@code progress} blocks of exploring towards both finds. */
+    /** Counts {@code progress} blocks of exploring towards both finds (more with the Scent upgrade). */
     public static void addProgress(Wolf wolf, double progress) {
         if (progress < MIN_PROGRESS) {
             return;
         }
-        float blocks = (float) Math.min(progress, MAX_PROGRESS);
+        float blocks = (float) Math.min(progress, MAX_PROGRESS) * WolfUpgrades.scentMultiplier(wolf);
         float rareBlocks = blocks * (1.0F + killBonus(wolf));
         WolfData.setScentDistance(wolf, false, Math.max(0.0F, distanceLeft(wolf, false) - blocks));
         WolfData.setScentDistance(wolf, true, Math.max(0.0F, distanceLeft(wolf, true) - rareBlocks));
