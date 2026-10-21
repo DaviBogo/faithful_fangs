@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "group": "wolf_armor",
+  "key": {
+    "#": "minecraft:wolf_armor",
+    "X": "minecraft:copper_ingot"
+  },
+  "pattern": [
+    "XXX",
+    "X#X",
+    "XXX"
+  ],
+  "result": {
+    "id": "faithful_fangs:copper_wolf_armor"
+  }
+}

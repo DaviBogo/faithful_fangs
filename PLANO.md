@@ -114,17 +114,17 @@ Aberto com **Shift + clique direito** no próprio lobo. Reúne:
 O desenho original (armadura que reduz o dano como a do jogador, receitas na mesa de trabalho e todos os encantamentos de armadura) foi trocado depois de analisar a armadura de tatu do vanilla.
 - **Funciona como a armadura de tatu do vanilla:** enquanto existe, **absorve 100% de cada golpe**; cada ponto de dano vira 1 ponto de desgaste, e o golpe que a quebra também é absorvido inteiro. Não protege do que a de tatu também não protege: afogamento, sufocar dentro de bloco, congelamento, fome, magia (poção de dano), efeito wither, espinhos, aperto de mobs, borda do mundo, vazio e `/kill`. Fogo, lava, queda, explosão e ataques ela absorve.
 - Mostra rachaduras em 3 estágios com som, tem som próprio ao quebrar e sai com tesoura (só o dono).
-- **Obtenção:** só na **mesa de ferraria, sem molde**: armadura de tatu no espaço do meio + **1 lingote ou diamante** no da direita. Todo tier sai **direto da de tatu**, inclusive o netherite. O desgaste, a cor tingida e o nome passam para a armadura nova.
+- **Obtenção** (mudada em 21/10/2026 para ficar mais perto do vanilla; antes era tudo na mesa de ferraria com 1 lingote): **cobre, ferro, ouro e diamante** na **mesa de trabalho**, com a armadura de tatu no centro e **8 do material em volta**; a armadura sai nova (sem desgaste nem cor). **Netherite** na **mesa de ferraria**, como o equipamento do jogador: **molde de melhoria de netherite + armadura de diamante + lingote de netherite**; desgaste, cor e nome passam para a de netherite.
 - **Tiers** (absorção em pontos de dano; um zumbi tira uns 3):
 
-| Tier | Material na ferraria | Absorve | Observação |
+| Tier | Receita | Absorve | Observação |
 |---|---|---|---|
 | Tatu | — (vanilla, 6 escamas) | 64 | Base |
-| Cobre | 1 lingote de cobre | 96 | |
-| Ouro | 1 lingote de ouro | 112 | **Protege o dono dos piglins**: com o lobo de armadura de ouro a até 16 blocos, os piglins tratam o dono como se ele usasse ouro. Brutos continuam hostis e piglins irritados continuam atacando, igual ao vanilla. (Piglins nunca atacam lobos por conta própria, só revidam.) |
-| Ferro | 1 lingote de ferro | 128 | |
-| Diamante | 1 diamante | 256 | |
-| Netherite | 1 lingote de netherite | 384 | O **item** não queima no fogo nem na lava |
+| Cobre | Tatu + 8 lingotes de cobre | 96 | |
+| Ouro | Tatu + 8 lingotes de ouro | 112 | **Protege o dono dos piglins**: com o lobo de armadura de ouro a até 16 blocos, os piglins tratam o dono como se ele usasse ouro. Brutos continuam hostis e piglins irritados continuam atacando, igual ao vanilla. (Piglins nunca atacam lobos por conta própria, só revidam.) |
+| Ferro | Tatu + 8 lingotes de ferro | 128 | |
+| Diamante | Tatu + 8 diamantes | 256 | |
+| Netherite | Ferraria: molde + diamante + lingote de netherite | 384 | O **item** não queima no fogo nem na lava |
 
 - **Conserto:** clique direito no lobo sentado com o material do tier (escama de tatu, lingote de cobre, de ferro, de ouro, diamante ou lingote de netherite) conserta 12,5%, igual à escama no vanilla. Também na bigorna.
 - **Tingimento:** a listra tingível da armadura de tatu continua em todos os tiers.
@@ -251,10 +251,10 @@ Detalhes definidos em 21/10/2026: layout "coluna ao lado" no Painel do lobo (op�
   - **Comandos de teste:** `/faithfulfangs debug` olhando para o lobo mostra os níveis, a vida máxima, o dano e a velocidade; `/faithfulfangs debug reset_upgrades` zera as melhorias do lobo que você está olhando.
 
 ### Fase 5 — Armadura (em andamento)
-Desenho refeito em 21/10/2026 (veja o sistema 6): absorve como a armadura de tatu, feita na mesa de ferraria com 1 lingote ou diamante, sem encantamentos; o ouro protege o dono dos piglins.
+Desenho refeito em 21/10/2026 (veja o sistema 6): absorve como a armadura de tatu, sem encantamentos; o ouro protege o dono dos piglins.
 - [x] **1. Tiers de armadura** (`item/WolfArmorTier`, `wolf/WolfArmor`, registrados em `registry/ModItems`):
   - Itens **Copper, Iron, Golden, Diamond e Netherite Wolf Armor**, na aba criativa Combate logo depois da armadura de tatu. A de netherite não queima no fogo nem na lava.
-  - **Mesa de ferraria, sem molde:** armadura de tatu + lingote de cobre, de ferro, de ouro, diamante ou lingote de netherite (`data/faithful_fangs/recipe/*_wolf_armor_smithing.json`). Desgaste, cor e nome passam para a nova.
+  - **Receitas** (refeitas em 21/10/2026; a primeira versão usava a mesa de ferraria sem molde para todos): cobre, ferro, ouro e diamante na **mesa de trabalho**, armadura de tatu no centro e 8 lingotes (ou diamantes) em volta (`recipe/<tier>_wolf_armor.json`); aparecem no livro de receitas quando o jogador tem uma armadura de tatu. Netherite na **mesa de ferraria**: molde de melhoria de netherite + Diamond Wolf Armor + lingote de netherite (`recipe/netherite_wolf_armor_smithing.json`), levando desgaste, cor e nome.
   - **Absorção** igual à de tatu (o jogo só faz isso para o item dele, então o mod repete a regra em `WolfArmor`): absorvem 96 (cobre), 112 (ouro), 128 (ferro), 256 (diamante) e 384 (netherite); rachaduras em 3 estágios com som e pedacinhos do material; som próprio ao quebrar; mesmas exceções (afogamento, fome, magia, wither, espinhos, vazio...).
   - **Conserto:** com o lobo sentado, clique direito com o material do tier conserta 12,5% (regra vanilla, que já vale para qualquer armadura de lobo); bigorna também.
   - **Tingimento:** mesma listra tingível da de tatu, com receita de tingir na mesa de trabalho e lavagem no caldeirão.

@@ -17,8 +17,10 @@ import net.minecraft.world.item.equipment.EquipmentAssets;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Wolf armor tiers made at the smithing table from the vanilla armadillo-scute Wolf Armor plus one
- * ingot or diamond. Like the vanilla one, each absorbs every hit until it breaks
+ * Wolf armor tiers. Copper, iron, golden and diamond are crafted with the vanilla armadillo-scute
+ * Wolf Armor in the middle of the crafting grid and eight ingots (or diamonds) around it; netherite
+ * comes from the diamond one at the smithing table, with the netherite upgrade template and a
+ * netherite ingot, like the player's gear. Like the vanilla one, each absorbs every hit until it breaks
  * ({@link com.davibogo.faithfulfangs.wolf.WolfArmor}); better tiers take more damage. They have
  * the same armor points as the vanilla one, cannot be enchanted and keep its dyeable stripes.
  */

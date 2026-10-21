@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:smithing_transform",
-  "base": "minecraft:wolf_armor",
-  "addition": "minecraft:diamond",
-  "result": {
-    "id": "faithful_fangs:diamond_wolf_armor"
-  }
-}

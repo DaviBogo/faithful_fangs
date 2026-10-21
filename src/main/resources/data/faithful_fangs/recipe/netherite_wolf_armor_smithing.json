@@ -1,7 +1,8 @@
 {
   "type": "minecraft:smithing_transform",
-  "base": "minecraft:wolf_armor",
-  "addition": "minecraft:netherite_ingot",
+  "template": "minecraft:netherite_upgrade_smithing_template",
+  "base": "faithful_fangs:diamond_wolf_armor",
+  "addition": "#minecraft:netherite_tool_materials",
   "result": {
     "id": "faithful_fangs:netherite_wolf_armor"
   }

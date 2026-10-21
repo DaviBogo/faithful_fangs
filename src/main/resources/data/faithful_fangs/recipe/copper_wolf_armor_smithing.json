@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:smithing_transform",
-  "base": "minecraft:wolf_armor",
-  "addition": "minecraft:copper_ingot",
-  "result": {
-    "id": "faithful_fangs:copper_wolf_armor"
-  }
-}
